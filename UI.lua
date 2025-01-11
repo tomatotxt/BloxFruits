@@ -14,7 +14,7 @@ local AutomationTab = MainWindow:CreateTab({
 	Visible = true 
 })
 
-_G.ChestAutoFarm = AutomationTab:Checkbox({
+local ChestAutoFarm = AutomationTab:Checkbox({
 	Label = "Chest Autofarm",
 	Value = false,
 	Callback = function(self, Value)
@@ -22,7 +22,7 @@ _G.ChestAutoFarm = AutomationTab:Checkbox({
 	end,
 })
 
-_G.AutoEquipWeapon = AutomationTab:Checkbox({
+local AutoEquipWeapon = AutomationTab:Checkbox({
 	Label = "Auto Equip Weapon",
 	Value = false,
 	Callback = function(self, Value)
@@ -30,8 +30,8 @@ _G.AutoEquipWeapon = AutomationTab:Checkbox({
 	end,
 })
 
+-- UI Update Loop
 while wait() do
-	for OptionName, Value in pairs(OptionsAPI.Options) do
-		_G[OptionName]:SetTicked(OptionsAPI.getOption(OptionName))
-	end
+	ChestAutoFarm:SetTicked(OptionsAPI.getOption(ChestAutoFarm))
+	AutoEquipWeapon:SetTicked(OptionsAPI.getOption(AutoEquipWeapon))
 end
