@@ -26,14 +26,19 @@ API.Teleport = function(Goal: CFrame, Speed)
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
 
     API.IsTeleporting = true
-    while Magnitude >= 1  do
+    local Loop = ServicesAPI.RunService.RenderStepped:Connect(function(deltaTime)
         local Direction = (Goal.Position - RootPart.Position).unit
-        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * wait())
+        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * deltaTime)
         RootPart.Velocity = Vector3.zero --Stop Character from moving specifically in the Y axis.
         Magnitude = (RootPart.Position - Goal.Position).Magnitude
+    end)
+
+    while Magnitude >= 1 do
+        wait(.1)
     end
+    Loop:Disconnect()
     API.IsTeleporting = false
-    
+
     API.toggleNoclip(false)
 end
 
