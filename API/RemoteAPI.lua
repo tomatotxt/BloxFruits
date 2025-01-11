@@ -28,16 +28,18 @@ local function getWeapon()
 end
 
 getgenv().Attack = false
-API.ToggleAttack = function()
-    getgenv().Attack = not getgenv().Attack
-    return getgenv().Attack
-end
 getgenv().FastAttack = false
+
+API.ToggleAttack = function()
+    Attack = not Attack
+    return Attack
+end
+
 API.RunService.RenderStepped:Connect(function()
-    if getgenv().FastAttack then
+    if FastAttack then
         
     end
-    if getgenv().Attack then
+    if Attack then
         PlayerAPI.getCharacter().Stun.Value = 0
         PlayerAPI.getCharacter().Humanoid.Sit = false
         API.attackMelee(getWeapon())
@@ -46,8 +48,8 @@ API.RunService.RenderStepped:Connect(function()
 end)
 
 API.ToggleFastAttack = function()
-    getgenv().FastAttack = not getgenv().FastAttack
-    return getgenv().FastAttack
+    FastAttack = not FastAttack
+    return FastAttack
 end
 
 return API

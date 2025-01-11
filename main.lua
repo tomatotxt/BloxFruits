@@ -1,5 +1,4 @@
 -- Constants
-local Mouse = game.Players.LocalPlayer:GetMouse()
 
 
 -- Auto Chest Utils
@@ -43,11 +42,11 @@ local function main() -- Run Once
     print("Main Loaded.")
 end
 local LoopRan = false
-local function mainloop() -- Loops
+local function mainloop() -- Repeat Constantly
     if Options.ChestAutoFarm then
         local Chests = getChestsSorted()
         if #Chests > 0 then
-            Teleport(Chests[1].CFrame)
+            TeleportAPI.Teleport(Chests[1].CFrame)
         else
             -- You can put serverhop here
         end
@@ -67,8 +66,8 @@ local function mainloop() -- Loops
     end
 end
 
-loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 wait = task.wait
+loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
 print("Main Loaded.")
 while wait() do mainloop(); end

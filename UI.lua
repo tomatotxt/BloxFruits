@@ -1,11 +1,5 @@
-getgenv().Options = {
-    ChestAutoFarm = false,
-    AutoAttack = false,
-    Weapon = "Melee" -- Options are "Melee", "Blox Fruit" Captilization Sensitive
-}
-
-
-
+-- Load main.lua
+loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/main.lua"))()
 
 local ImGui = loadstring(game:HttpGet('https://github.com/depthso/Roblox-ImGUI/raw/main/ImGui.lua'))()
 

@@ -1,0 +1,15 @@
+{
+    "krnlLsp.diagnostics.globals": [
+        "TeleportAPI",
+        "PlayerAPI",
+        "owner",
+        "branch",
+        "Options",
+        "Teleport",
+        "getnamecallmethod",
+        "Attack",
+        "FastAttack",
+        "getinfo",
+        "setthreadidentity"
+    ]
+}
