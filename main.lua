@@ -41,8 +41,15 @@ local function main() -- Run Once
     return true
 end
 
-local LoopRan = false
 local function mainloop() -- Repeat Constantly
+    if OptionsAPI.getOption("AutoEquipWeapon") then
+        local Character = PlayerAPI.getCharacter()
+        for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
+            if Tool.ToolTip == Options.Weapon then
+                Tool.Parent = Character
+            end
+        end
+    end
     if OptionsAPI.getOption("ChestAutoFarm") then
         local Chests = getChestsSorted()
         if #Chests > 0 then
@@ -50,23 +57,10 @@ local function mainloop() -- Repeat Constantly
         end
         return
     end
-    if OptionsAPI.getOption("AutoAttack") then
-        local Character = PlayerAPI.getCharacter()
-        for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
-            if Tool.ToolTip == Options.Weapon then
-                Tool.Parent = Character
-            end
-        end
-
-    end
-    if LoopRan ~= true then
-        LoopRan = true
-        print("Main Loop Working.")
-    end
 end
 
 wait = task.wait
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
-print("Main Loaded.")
 task.spawn(function() while wait() do mainloop(); end end)
+print("Main Loaded.")

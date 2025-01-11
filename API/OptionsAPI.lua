@@ -14,7 +14,7 @@ end
 API.setOption("AutoFarm", false)
 API.setOption("ChestAutoFarm", false)
 API.setOption("FruitSniper", false)
-API.setOption("AutoAttack", false)
+API.setOption("AutoEquipWeapon", false)
 API.setOption("Weapon", "Melee") -- Options are "Melee", "Blox Fruit", "Sword" Captilization Sensitive
 
 return API
