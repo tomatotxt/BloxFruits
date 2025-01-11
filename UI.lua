@@ -31,7 +31,7 @@ _G.AutoEquipWeapon = AutomationTab:Checkbox({
 })
 
 while wait() do
-	for i, Option in pairs(OptionsAPI.Options) do
-		_G[Option]:SetTicked(OptionsAPI.getOption(Option))
+	for OptionName, Value in pairs(OptionsAPI.Options) do
+		_G[OptionName]:SetTicked(OptionsAPI.getOption(OptionName))
 	end
 end
