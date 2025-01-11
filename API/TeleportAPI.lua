@@ -11,7 +11,7 @@ end
 API.DefaultSpeed = 300
 API.IsTeleporting = false
 
-local INTERUPT = false
+local INTERRUPT = false
 API.Teleport = function(Goal: CFrame, Speed)
     if not Speed then
         Speed = API.DefaultSpeed
@@ -21,21 +21,19 @@ API.Teleport = function(Goal: CFrame, Speed)
     RootPart.CFrame = CFrame.new( (RootPart.Position - Vector3.new(0, RootPart.Position.Y, 0)) + Vector3.new(0, Goal.Position.Y, 0) ) -- Set RootPart Height to Height of Goal
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
 
-    while not (Magnitude < 1) and not INTERUPT do
+    while Magnitude >= 1 and INTERRUPT == false do
         API.IsTeleporting = true
         local Direction = (Goal.Position - RootPart.Position).unit
         RootPart.CFrame = RootPart.CFrame + Direction * (Speed * wait())
         Magnitude = (RootPart.Position - Goal.Position).Magnitude
     end
     API.IsTeleporting = false
-    INTERUPT = false
+    INTERRUPT = false
     API.toggleNoclip(false)
 end
 
-API.InteruptTeleport = function()
-    INTERUPT = true
-    wait()
-
+API.InterruptTeleport = function()
+    INTERRUPT = true
 end
 
 return API
