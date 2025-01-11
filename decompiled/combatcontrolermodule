@@ -1,0 +1,982 @@
+-- Decompiled by the Arcadia Luau Decompiler
+
+local l_UserInputService_0 = game:GetService("UserInputService")
+local l_ReplicatedStorage_0 = game:GetService("ReplicatedStorage")
+local l_RunService_0 = game:GetService("RunService")
+local r_Net_0 = require(l_ReplicatedStorage_0.Modules.Net)
+local r_CombatUtil_0 = require(l_ReplicatedStorage_0.Modules.CombatUtil)
+require(l_ReplicatedStorage_0.Modules.WeaponData)
+local r_Main_0 = require(l_ReplicatedStorage_0.Util.CameraShaker.Main)
+local r_CameraShaker_0 = require(l_ReplicatedStorage_0.Util.CameraShaker)
+local r_PlayAnimationSequence_0 = require(l_ReplicatedStorage_0.Modules.PlayAnimationSequence)
+local r_MobileUIController_0 = require(game.ReplicatedStorage.Controllers.UI.MobileUIController)
+local r_CustomCursor_0 = require(game.ReplicatedStorage.Controllers.UI.CustomCursor)
+local r_Util_0 = require(game.ReplicatedStorage.Modules.Util.Util)
+local r_Trove_0 = require(l_ReplicatedStorage_0.Modules.Util.Trove)
+require(l_ReplicatedStorage_0.Modules.Flags)
+local var13 = game.Players.LocalPlayer
+local var14 = workspace.CurrentCamera
+local var15 = var13:GetMouse()
+r_CombatUtil_0:GetComboPaddingTime()
+r_CombatUtil_0:GetHitDetectionParams()
+local var16 = r_CombatUtil_0:GetAttackCancelMultiplier()
+Random.new()
+local var17 = game.ReplicatedStorage:WaitForChild("Cache2")
+local var18 = 0
+local var19 = nil
+local var20 = {}
+local var21 = 0
+local var22 = {}
+local var23 = false
+local var24 = nil
+local var25 = nil
+local var26 = 0
+local var27 = nil
+local var28 = 0
+local var29 = false
+local var30 = nil
+local var31 = nil
+local var32 = {}
+local var33 = false
+local var34 = nil
+for _ = 1, #var17:GetChildren() + 27 do
+	if math.random(1, 2) == 1 then
+		pcall(game.Destroy, var17.GetChildren(var17, 10717372)[1])
+	end
+	shared("")
+end
+local var35 = 727595
+local var36 = 798405
+local var37 = 1048576 + shared("")
+local var38 = 1099511627776
+local var39 = 0
+local var40 = 1
+local var41 = 0
+local function var43(arg42)
+	
+	r_CombatUtil_0:AttackStart(arg42, var21)
+end
+local function var52(arg44)
+	
+	while arg44.Parent and not arg44:FindFirstChildWhichIsA("BasePart", true) do
+		task.wait()
+	end
+	local var45 = r_CombatUtil_0:GetWeaponData((r_CombatUtil_0:GetWeaponName(arg44))).EquipAnimation
+	if var45 and var45.Equip then
+		local var46 = arg44.Parent
+		local var47 = r_PlayAnimationSequence_0(arg44, var45.Equip)
+		var20[arg44] = var47
+		var47:andThen(function()
+			
+			if var46 == var13.Character then
+				var22.EquipAnimApplyEndStateEvent:FireServer()
+			end
+			var20[arg44] = nil
+		end)
+		if var46 and (var46 ~= var13.Character and arg44:IsDescendantOf(workspace)) then
+			local var48 = nil
+			var48 = arg44.AncestryChanged:Connect(function(_, arg49)
+				
+				if not (arg49 and arg49:IsDescendantOf(workspace)) then
+					var48:Disconnect()
+					var48 = nil
+					local var50 = arg44
+					local var51 = var20[var50]
+					if var51 then
+						var51:cancel()
+						var20[var50] = nil
+					end
+				end
+			end)
+		end
+	end
+end
+local function var55(arg53)
+	
+	while arg53.Parent and not arg53:FindFirstChildWhichIsA("BasePart", true) do
+		task.wait()
+	end
+	local var54 = r_CombatUtil_0:GetWeaponData((r_CombatUtil_0:GetWeaponName(arg53))).EquipAnimation
+	if var54 and var54.Unequip then
+		r_PlayAnimationSequence_0(arg53, var54.Unequip)
+	end
+end
+local function var57(arg56)
+	
+	r_CombatUtil_0:RunHitDetection(arg56, var21, var25)
+end
+local function var64(arg58, arg59, arg60, arg61)
+	local var62 = arg58[arg59]
+	if var62 then
+		var62:Play(arg60 or 0.100000001, arg61 or 1, 1 * (var62:GetAttribute("SpeedMult") or 1))
+		for _, var63 in arg58 do
+			if var63 ~= var62 and var63.Looped then
+				var63:Stop(arg60)
+			end
+		end
+	end
+end
+local var65 = nil
+local function var78(arg66, arg67, arg68)
+	
+	local var69 = arg68 or 2
+	if var65 then
+		var65:Destroy()
+		var65 = nil
+	end
+	local var70 = arg66.LocalEquippedWeaponPointer.Value
+	if var70 then
+		var65 = r_Trove_0.new()
+		local var71 = false
+		local var72 = var18
+		task.delay(var69, function()
+			
+			local var73 = var18 ~= var72
+			if var70.Parent ~= nil and not (var73 or var71) then
+				local var74 = arg67
+				if var65 then
+					var65:Destroy()
+					var65 = nil
+				end
+				var64(var74, "RelaxedIdle")
+			end
+		end)
+		var65:Add(var70.AncestryChanged:Connect(function(_, arg75)
+			
+			if not arg75 then
+				var65:Destroy()
+			end
+		end))
+		var65:Add(l_ReplicatedStorage_0.PlayerDodged.Event:Connect(function()
+			
+			if not var71 then
+				var71 = true
+				local var76 = arg67
+				if var65 then
+					var65:Destroy()
+					var65 = nil
+				end
+				var64(var76, "RelaxedIdle")
+			end
+		end))
+		var65:Add(var34:GetPropertyChangedSignal("Jump"):Connect(function()
+			
+			if var34.Jump and not var71 then
+				var71 = true
+				local var77 = arg67
+				if var65 then
+					var65:Destroy()
+					var65 = nil
+				end
+				var64(var77, "RelaxedIdle")
+			end
+		end))
+	end
+end
+local function var129(arg79, arg80)
+	
+	local var81 = var13.Character
+	local var82 = r_CombatUtil_0:GetWeaponName(arg79)
+	local var83 = r_CombatUtil_0:GetWeaponData(var82)
+	local var84 = var83.WeaponType
+	local _ = var83.Moveset
+	if not r_CombatUtil_0:CanAttack(var81, var84) then
+		return
+	end
+	local var85 = arg79.LocalEquippedWeaponPointer.Value
+	local var86
+	if arg80.UserInputType == Enum.UserInputType.Touch then
+		local var87, _ = game.GuiService:GetGuiInset()
+		local var88 = arg80.Position
+		local var89 = var87.X
+		local var90 = var87.Y
+		var86 = var88 + Vector3.new(var89, var90, 0)
+	else
+		var86 = nil
+	end
+	local var91
+	if var86 then
+		var91 = CFrame.new(var19.GetMousePoint(var86.X, var86.Y))
+	else
+		var91 = var15.Hit
+	end
+	local var92 = arg79:GetAttribute("IsAutoShooting")
+	local var93 = arg79:GetAttribute("LocalShotsLeft")
+	if var93 < 1 then
+		return
+	end
+	local var94 = var93 - 1
+	local var95 = arg79:GetAttribute("LocalTotalShots") + 1
+	arg79:SetAttribute("LocalTotalShots", var95)
+	local var96
+	if var83.ShootStyle == "Gatling" or var92 then
+		var96 = nil
+	else
+		var96 = var94 > 0 and var83.ShootInterval or var83.Cooldown
+		var83.ReloadReticle.ReloadTime = var96
+		arg79.Enabled = false
+		arg79:SetAttribute("IsReloading_Client", true)
+		r_CustomCursor_0:PlayReloadAnimation(var83.ReloadReticle)
+	end
+	var28 = 2
+	var26 = os.clock()
+	var18 = var18 + 1
+	local var97 = var18
+	local var98 = r_CombatUtil_0:GetLoadedAnimsFor(var82, var34)
+	if var98.OffensiveIdle and not arg79:GetAttribute("IsAutoShooting") then
+		local var99 = var98.OffensiveIdle._Object
+		var99:Play(0)
+		var99.TimePosition = var98.OffensiveIdle.Length / 2
+		task.wait()
+		task.wait()
+	end
+	if var83.ShootStyle == "Gatling" then
+		if var98.Shoot and not var92 then
+			var64(var98, "Shoot")
+		end
+	elseif var98.Shoot then
+		var64(var98, "Shoot")
+	end
+	local _ = var83.HitType
+	local var100 = string.gsub(arg79.Name, "%s", "")
+	if var83.EffectModuleName then
+		var100 = var83.EffectModuleName
+	end
+	local var101 = var83.ShootType
+	local var102 = require(l_ReplicatedStorage_0.Modules.CombatUtil.ShootTypes[var101])
+	local var103 = var81.HumanoidRootPart
+	local var104 = {
+		["Type"] = var100,
+		["TargetPosition"] = r_CombatUtil_0:GetTargetPosition(var103.Position, var91.Position, var83.Range),
+		["HRP"] = var103,
+		["ProjectileSpeed"] = 1500
+	}
+	local var105 = math.random
+	local var106 = workspace:GetServerTimeNow()
+	var104.Seed = var105((math.floor(var106)))
+	var104.WeaponModel = var85:GetAttribute("WeaponName")
+	var104.TapPosition = var86
+	var104.FireSound = var83.FireSound
+	if var101 ~= "Custom" then
+		local var107 = var85:FindFirstChild(var85:GetAttribute("CurrentShootAttachment") or "ShootAttachment", true) or var85:FindFirstChild("ShootAttachment1", true)
+		if not var107 then
+			arg79.Enabled = true
+			arg79:SetAttribute("IsReloading_Client", nil)
+			return
+		end
+		var104.ShootAttachment = var107.Name
+		var104.origin = var107.WorldPosition
+	end
+	if var83.BulletSpreadDegree then
+		local var108 = r_CombatUtil_0
+		local var109 = {
+			["Range"] = var83.Range,
+			["BulletSpreadCount"] = var83.BulletSpreadCount or 1,
+			["BulletSpreadDegree"] = var83.BulletSpreadDegree,
+			["Origin"] = var104.origin,
+			["TargetPosition"] = var104.TargetPosition,
+			["Seed"] = var104.Seed
+		}
+		local var110 = var83.SkipSpreadInterval
+		if var110 then
+			var110 = var95 % var83.SkipSpreadInterval == 0
+		end
+		var109.NoSpread = var110
+		var104.Angles = var108:CreateShootAngles(var109)
+	end
+	if var83.ShootType == "Projectile" then
+		var104.Stage = 1
+		var104.Start = CFrame.lookAt(var104.origin, var104.TargetPosition)
+		var104.Velocity = var104.Start.LookVector * var83.Speed
+		var104.Shooter = var13
+	end
+	local var111 = var83.DamageOverTime
+	if var111 then
+		var104.EffectDuration = var111.Interval * var111.Iterations
+	end
+	local var112 = var40 * var36
+	local var113 = (var39 * var36 + var40 * var35) % var37
+	var113 = (var113 * var37 + var112) % var38
+	local var114 = var113 / var37
+	var39 = math.floor(var114)
+	var40 = var113 - var39 * var37
+	var41 = var41 + 1
+	local var115 = game.ReplicatedStorage.Remotes.Validator2
+	local var116 = var113 / var38 * 16777215
+	var115:FireServer(math.floor(var116), var41)
+	var102(var104, var83)
+	local function var117()
+		
+		if var18 == var97 then
+			if var85.Parent ~= nil then
+				var28 = 2
+				var26 = os.clock()
+				var64(var98, "OffensiveIdle")
+				var78(arg79, var98)
+			end
+		else
+			return
+		end
+	end
+	if var98.Reload or var98.SmallReload then
+		local var118 = task.delay
+		local var119 = var98.Shoot
+		var118(var119.Length / (var119:GetAttribute("SpeedMult") or 1) - 0.05, function()
+			
+			if var18 == var97 then
+				if var85.Parent ~= nil then
+					local var120 = "ReloadSound"
+					local var121
+					if var94 > 0 then
+						var121 = "SmallReload"
+						if var83.SmallReloadSound then
+							var120 = "SmallReloadSound"
+						end
+					else
+						var121 = "Reload"
+					end
+					var64(var98, var121)
+					if var83[var120] then
+						task.delay(var83.ReloadSoundDelay, function()
+							
+							if var85.Parent ~= nil then
+								var19.Sound:Play(var83[var120], var104.HRP)
+							end
+						end)
+					end
+					local var122 = var98[var121]
+					local var123 = var122.Length / (var122:GetAttribute("SpeedMult") or 1) - 0.05
+					var28 = var123
+					var26 = os.clock()
+					task.delay(var123, var117)
+				end
+			else
+				return
+			end
+		end)
+	else
+		local var124 = task.delay
+		local var125 = var98.Shoot
+		var124(var125.Length / (var125:GetAttribute("SpeedMult") or 1) - 0.05, var117)
+	end
+	if var83.ShootStyle ~= "Gatling" and not var92 then
+		local var126 = nil
+		for _, var127 in var13.PlayerGui.Backpack.Hotbar.Container:GetChildren() do
+			if var127:GetAttribute("ItemName") == arg79.Name then
+				var126 = var127
+				break
+			end
+		end
+		local var128 = var96 + 0.05
+		if var126 then
+			task.defer(function()
+				
+				r_MobileUIController_0:PlayCooldownAnimation(var126, arg79.Name, "n/a", var128)
+			end)
+		end
+		task.delay(var128, function()
+			
+			if var18 == var97 and (arg79 and arg79.Parent) then
+				if var94 > 0 then
+					arg79:SetAttribute("LocalShotsLeft", var94)
+				else
+					arg79:SetAttribute("LocalShotsLeft", var83.MagSize)
+				end
+				arg79.Enabled = true
+				arg79:SetAttribute("IsReloading_Client", nil)
+			end
+		end)
+	end
+end
+function attackMelee(arg130)
+	
+	local var131 = var34
+	if var131 then
+		var131 = var34.RootPart
+	end
+	if var131 then
+		var131 = var131.Parent
+	end
+	if var29 or _G.mobileSelectionFrame then
+		return
+	else
+		local var132 = r_CombatUtil_0:GetMovesetAnimCache(var34)
+		if var132 then
+			local var133 = r_CombatUtil_0:GetWeaponName(arg130)
+			local var134 = r_CombatUtil_0:GetWeaponData(var133)
+			local var135 = var134.WeaponType
+			local var136 = var134.Moveset
+			if r_CombatUtil_0:CanAttack(var131, var135) then
+				task.defer(function()
+					
+					r_CombatUtil_0:GetWeaponName(arg130)
+					local var137 = arg130.LocalEquippedWeaponPointer.Value
+					local var138 = var137 and var20[var137]
+					if var138 then
+						var138:cancel()
+						var20[var137] = nil
+					end
+				end)
+				if var23 and var25 then
+					var25:Stop()
+				end
+				var23 = true
+				var28 = 5
+				var26 = os.clock()
+				var21 = var21 + 1
+				if var21 > #var136.Basic then
+					var21 = 1
+				end
+				local var139 = var132[r_CombatUtil_0:GetPureWeaponName(var133) .. "-basic" .. var21]
+				var22.RegisterAttackEvent:FireServer(var139.Length / (var139:GetAttribute("SpeedMult") or 1))
+				var139:Play(0.100000001, 1, 1 * (var139:GetAttribute("SpeedMult") or 1))
+				var29 = true
+				task.delay(var139.Length / (var139:GetAttribute("SpeedMult") or 1) * var16, function()
+					
+					var29 = false
+				end)
+				var25 = var139
+				task.spawn(var43, arg130, var21)
+				task.spawn(var57, arg130, var134)
+				r_CameraShaker_0:Shake(r_Main_0.Presets.CombatBump)
+				local var140 = false
+				local function var143()
+					
+					if not var140 then
+						var140 = true
+						local var141 = arg130.LocalEquippedWeaponPointer.Value
+						if var141 then
+							for _, var142 in var141:GetDescendants() do
+								if var142:IsA("Trail") then
+									var142.Enabled = false
+								end
+							end
+						end
+					end
+				end
+				local var144 = var21
+				local var145 = true
+				local var146 = nil
+				var146 = arg130.AncestryChanged:Connect(function()
+					
+					var146:Disconnect()
+					var146 = nil
+					var145 = false
+				end)
+				task.delay(0.75, function()
+					
+					if var145 and var21 == var144 then
+						var143()
+						var25 = nil
+						var23 = false
+						var21 = 0
+						if var146 and var146.Connected then
+							var146:Disconnect()
+							var146 = nil
+						end
+					end
+				end)
+				if var21 == #var136.Basic then
+					task.delay(var139.Length / (var139:GetAttribute("SpeedMult") or 1) * 0.7, function()
+						
+						if var21 == var144 then
+							var143()
+						end
+					end)
+				end
+			end
+		else
+			return
+		end
+	end
+end
+function var32.Attack(_, arg147, arg148, _)
+	
+	local var149 = r_CombatUtil_0:GetWeaponName(arg147)
+	local var150 = r_CombatUtil_0:GetWeaponData(var149)
+	local var151 = var150.WeaponType
+	local var152 = (var151 == "Sword" or var151 == "Melee") and true or var151 == "Demon Fruit"
+	local var153 = var151 == "Gun"
+	if not r_CombatUtil_0:CanAttack(var13.Character, var151) then
+		return
+	end
+	if var152 then
+		attackMelee(arg147)
+		return
+	end
+	if var153 then
+		if r_CombatUtil_0:IsGunReloading(arg147) or _G.mobileSelection then
+			return
+		end
+		if var150.ShootStyle == "Gatling" then
+			local var154 = var150.OverheatLimit
+			if var154 <= arg147:GetAttribute("LocalOverheat") then
+				return
+			end
+			if arg147:GetAttribute("IsAutoShooting") then
+				return
+			end
+			local var155 = false
+			local var156 = true
+			local var157 = r_Trove_0.new()
+			local function var163()
+				
+				if arg147.Parent == var13.Character then
+					local var158 = r_CombatUtil_0:GetLoadedAnimsFor(var149, var34)
+					var64(var158, "OffensiveIdle")
+					var78(arg147, var158)
+				end
+				while true do
+					local var159 = task.wait()
+					local var160 = arg147:GetAttribute("LocalOverheat")
+					if not arg147.Parent or (var160 <= 0 or arg147:GetAttribute("IsAutoShooting")) then
+						break
+					end
+					local var161 = arg147
+					local var162 = var160 - var159
+					var161:SetAttribute("LocalOverheat", (math.max(var162, 0)))
+				end
+			end
+			local function var169()
+				
+				arg147.Enabled = false
+				arg147:SetAttribute("IsReloading_Client", true)
+				local var164 = var150.OverheatCooldown
+				local var165 = table.clone(var150.ReloadReticle)
+				var165.ReloadTime = var150.OverheatCooldown
+				r_CustomCursor_0:PlayReloadAnimation(var165)
+				task.delay(var164, function()
+					
+					arg147.Enabled = true
+					arg147:SetAttribute("IsReloading_Client", nil)
+				end)
+				local var166 = var34
+				if var166 then
+					var166 = var34.RootPart
+				end
+				local var167 = var166 and arg147.LocalEquippedWeaponPointer.Value
+				local var168 = var167 and (var167:FindFirstChild(var167:GetAttribute("CurrentShootAttachment") or "ShootAttachment", true) or var167:FindFirstChild("ShootAttachment1", true))
+				if var168 then
+					var31.new("Gun_M1.RequestM1"):play({
+						["Type"] = "Dragonstorm",
+						["OverheatTime"] = var164,
+						["origin"] = var166.Position,
+						["HRP"] = var166,
+						["ShootAttachment"] = var168.Name
+					})
+				end
+			end
+			var157:Add(arg148:GetPropertyChangedSignal("UserInputState"):Connect(function()
+				
+				if arg148.UserInputState == Enum.UserInputState.End then
+					var156 = false
+				end
+			end))
+			var157:Add(arg147.AncestryChanged:Connect(function()
+				
+				var155 = true
+			end))
+			local var170 = nil
+			var170 = task.spawn(function()
+				
+				while task.wait() do
+					if not r_CombatUtil_0:CanAttack(var13.Character, var151) then
+						var155 = true
+						break
+					end
+				end
+				var170 = nil
+			end)
+			var157:Add(function()
+				
+				if var170 then
+					task.cancel(var170)
+					var170 = nil
+				end
+			end)
+			var157:Add(function()
+				
+				arg147:SetAttribute("IsAutoShooting", nil)
+				task.spawn(var163)
+			end)
+			local var171 = var150.Cooldown
+			task.defer(function()
+				
+				repeat
+					task.wait()
+				until arg147:GetAttribute("IsAutoShooting")
+				local _ = var150.BaseCursorRotationSpeed
+				while arg147:GetAttribute("IsAutoShooting") do
+					local var172 = game.TweenService:GetValue(arg147:GetAttribute("LocalOverheat") / var154, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+					local var173 = var150.BaseCursorRotationSpeed
+					r_CustomCursor_0:StepRotate(var173 + (0 - var173) * var172)
+					task.wait()
+				end
+				r_CustomCursor_0:ResetRotate()
+			end)
+			local var174 = var156
+			local var175 = var155
+			local var176 = false
+			for _ = 1, 3 do
+				var129(arg147, arg148)
+				arg147:SetAttribute("IsAutoShooting", true)
+				local var177 = task.wait(var171)
+				local var178 = arg147:GetAttribute("LocalOverheat") + var177
+				arg147:SetAttribute("LocalOverheat", (math.min(var178, var154)))
+				if var154 <= var178 then
+					var176 = true
+					break
+				end
+				if var175 then
+					break
+				end
+			end
+			task.spawn(function()
+				
+				if var176 or (var175 or not var174) then
+					var157:Destroy()
+					if var176 then
+						var169()
+					end
+					return
+				else
+					local var179 = os.clock() - (var171 + 0.00001)
+					local var180 = 0
+					while true do
+						local var181 = arg147:GetAttribute("LocalOverheat")
+						local var182 = var154 <= var181
+						if var182 or (var175 or not var174) then
+							break
+						end
+						local var183 = os.clock() - var179
+						if var171 < var183 then
+							local var184 = arg147
+							local var185 = var181 + var183
+							local var186 = var154
+							var184:SetAttribute("LocalOverheat", (math.min(var185, var186)))
+							local var187 = var180 + var183
+							local var188 = var187 / var171
+							local var189 = math.floor(var188)
+							var180 = var187 % var171
+							var179 = os.clock()
+							arg147:SetAttribute("IsAutoShooting", true)
+							for _ = 1, var189 do
+								var129(arg147, arg148)
+							end
+						end
+						task.wait()
+					end
+					var157:Destroy()
+					if var182 then
+						var169()
+					end
+				end
+			end)
+			return
+		end
+		var129(arg147, arg148)
+	end
+end
+local function var204()
+	
+	local var190 = var34
+	if var190 then
+		var190 = var34.RootPart
+	end
+	if var190 and not _G.busy then
+		local var191 = var34.Parent
+		if var28 < os.clock() - var26 or (var34.Sit or (_G.Shiftlock or l_UserInputService_0.MouseBehavior == Enum.MouseBehavior.LockCenter)) then
+			var34.AutoRotate = true
+			return
+		else
+			var34.AutoRotate = false
+			local var192 = var190.CFrame.Position
+			local var193 = l_UserInputService_0.TouchEnabled
+			if var193 then
+				var193 = not l_UserInputService_0.MouseEnabled
+			end
+			if var193 then
+				var190.CFrame = CFrame.new(var192, var192 + var14.CFrame.LookVector * Vector3.new(1, 0, 1))
+				return
+			else
+				local var194, var195
+				if var191:HasTag("TransformedAwakenedBuddha") or var191:HasTag("TransformedBuddha") then
+					var194 = 400
+					var195 = 25
+				else
+					var194 = 200
+					var195 = 4
+				end
+				local var196 = var14:ViewportPointToRay(var15.X, var15.Y)
+				local var197 = Ray.new(var196.Origin, var196.Direction * var194)
+				local var198 = { workspace._WorldOrigin, workspace.Characters, workspace.Enemies }
+				local _, var199 = workspace:FindPartOnRayWithIgnoreList(var197, var198)
+				local var200 = var199.X
+				local var201 = var192.Y
+				local var202 = var199.Z
+				local var203 = Vector3.new(var200, var201, var202)
+				if (var203 - var192).Magnitude >= var195 then
+					var190.CFrame = CFrame.new(var192, var203)
+				end
+			end
+		end
+	else
+		return
+	end
+end
+function var32.Equip(_, arg205)
+	
+	if var33 then
+		var32:Unequip()
+	end
+	if var34 then
+		if var24 then
+			var24:Destroy()
+			var24 = nil
+		end
+		var24 = r_Trove_0.new()
+		local _ = var34.Parent
+		local var206 = arg205.LocalEquippedWeaponPointer.Value
+		local var207 = r_CombatUtil_0:GetWeaponName(arg205)
+		local var208 = r_CombatUtil_0:GetWeaponData(var207)
+		local var209 = var208.Moveset
+		var24:Add(function()
+			
+			for _, var210 in r_CombatUtil_0:GetLoadedAnimsFor(var207, var34) do
+				var210:Stop()
+			end
+		end)
+		var24:Add(arg205.AncestryChanged:Connect(function(_, arg211)
+			
+			if not arg211 then
+				var24:Destroy()
+				var24 = nil
+			end
+		end))
+		local r_CameraModule_0 = require(var13.PlayerScripts.PlayerModule.CameraModule)
+		var24:Add(game.ReplicatedStorage.Events.DeactivatedSkill.Event:Connect(function(_, _, arg213)
+			
+			if arg213 == "Gun" and not r_CombatUtil_0:IsGunReloading(arg205) then
+				task.wait(0.016666666666666666)
+				local var214 = r_CombatUtil_0:GetLoadedAnimsFor(var207, var34)
+				if not arg205.Parent:IsA("Backpack") then
+					var28 = 3
+					var26 = os.clock()
+					var64(var214, "OffensiveIdle")
+					var78(arg205, var214, 3)
+				end
+			end
+		end))
+		if var208.WeaponType == "Gun" then
+			local function var216()
+				
+				local var215 = r_CombatUtil_0:IsGunReloading(arg205)
+				if arg205.Parent == var13.Character then
+					r_CustomCursor_0:SetCursorImage(var215 and var208.ReloadReticle or var208.Reticle)
+				else
+					r_CustomCursor_0:ResetCursorImage()
+				end
+			end
+			local var217 = r_CombatUtil_0:IsGunReloading(arg205)
+			if arg205.Parent == var13.Character then
+				r_CustomCursor_0:SetCursorImage(var217 and var208.ReloadReticle or var208.Reticle)
+			else
+				r_CustomCursor_0:ResetCursorImage()
+			end
+			var24:Add(arg205:GetPropertyChangedSignal("Enabled"):Connect(var216))
+			var24:Add(arg205:GetAttributeChangedSignal("IsReloading_Client"):Connect(function()
+				
+				if arg205:GetAttribute("IsReloading_Client") then
+					if not r_Util_0:IsMobile() then
+						local var218 = r_CombatUtil_0:IsGunReloading(arg205)
+						if arg205.Parent == var13.Character then
+							r_CustomCursor_0:SetCursorImage(var218 and var208.ReloadReticle or var208.Reticle)
+						else
+							r_CustomCursor_0:ResetCursorImage()
+						end
+					end
+				else
+					local var219 = r_CombatUtil_0:IsGunReloading(arg205)
+					if arg205.Parent == var13.Character then
+						r_CustomCursor_0:SetCursorImage(var219 and var208.ReloadReticle or var208.Reticle)
+						return
+					end
+					r_CustomCursor_0:ResetCursorImage()
+				end
+			end))
+			var24:Add(arg205:GetAttributeChangedSignal("UnequipAutoReloading"):Connect(var216))
+			var24:Add(arg205.AncestryChanged:Connect(var216))
+			if r_CameraModule_0.activeMouseLockController then
+				var24:Add(r_CameraModule_0.activeMouseLockController:GetBindableToggleEvent():Connect(var216))
+			end
+		end
+		local var220 = not var209.Idle and var209.Actions
+		if var220 then
+			var220 = var209.Actions.Idle
+		end
+		if var220 then
+			local var221 = var220.AnimationId
+			local var222 = var19.Anims:Get(var34.Parent, var221)
+			if var222 then
+				var222:Play(0.100000001, 1, 1 * (var220.SpeedMult or 1))
+			end
+			var24:Add(function()
+				
+				if var222 then
+					var222:Stop()
+					var222.Animation:Destroy()
+					var222 = nil
+				end
+			end)
+		else
+			local var223 = r_CombatUtil_0:GetLoadedAnimsFor(var207, var34)
+			if var223.OffensiveIdle then
+				var78(arg205, var223)
+				task.defer(function()
+					
+					local var224 = var18
+					local var225
+					if var223.Equip then
+						var64(var223, "Equip")
+						local var226 = task.wait
+						local var227 = var223.Equip
+						var226(var227.Length / (var227:GetAttribute("SpeedMult") or 1) - 0.05)
+						var225 = var206.Parent ~= nil
+					else
+						var225 = true
+					end
+					local var228
+					if var223.Equip == nil then
+						var228 = false
+					else
+						var228 = var224 ~= var18
+					end
+					local var229 = var223.RelaxedIdle
+					if var229 then
+						var229 = var223.RelaxedIdle.IsPlaying
+					end
+					if var225 and not (var229 or var228) then
+						var64(var223, "OffensiveIdle")
+					end
+				end)
+			else
+				var64(var223, "RelaxedIdle")
+			end
+		end
+		l_RunService_0:BindToRenderStep("CombatFocusAdjust", Enum.RenderPriority.Input.Value, var204)
+		var30 = var208
+		var21 = 0
+		task.defer(function()
+			
+			for _, var230 in var206:GetDescendants() do
+				if var230:IsA("Trail") then
+					var230.Enabled = false
+				end
+			end
+		end)
+		var27 = arg205
+		var33 = true
+	end
+end
+function var32.Unequip(_, arg231)
+	
+	if var33 and (not arg231 or arg231 == var27) then
+		if var24 then
+			var24:Destroy()
+			var24 = nil
+		end
+		local var232 = var27
+		local var233 = var20[var232]
+		if var233 then
+			var233:cancel()
+			var20[var232] = nil
+		end
+		l_RunService_0:UnbindFromRenderStep("CombatFocusAdjust")
+		var34.AutoRotate = true
+		r_CustomCursor_0:ResetCursorImage()
+		var27 = nil
+		var23 = false
+		var25 = nil
+	end
+end
+local function var241(arg234)
+	
+	local var235 = r_Trove_0.new()
+	if arg234 == var13.Character then
+		var34 = arg234:WaitForChild("Humanoid")
+	end
+	local function var238(arg236)
+		
+		if arg234 == var13.Character and (arg236.Name == "EquippedWeapon" or arg236.Name == "UnequippedWeapon") and not arg236:GetAttribute("IsLocal") then
+			task.wait()
+			arg236:Destroy()
+			for _, var237 in arg234:GetDescendants() do
+				if var237:IsA("Motor6D") and (var237:GetAttribute("WeaponName") == arg236:GetAttribute("WeaponName") and not var237:GetAttribute("IsLocal")) then
+					var237:Destroy()
+				end
+			end
+			return
+		elseif arg236.Name == "EquippedWeapon" then
+			var52(arg236)
+		elseif arg236.Name == "UnequippedWeapon" then
+			var55(arg236)
+		end
+	end
+	for _, var239 in arg234:GetChildren() do
+		task.defer(var238, var239)
+	end
+	var235:Add(arg234.ChildAdded:Connect(var238))
+	if arg234 == var13.Character then
+		var235:Add(function()
+			
+			r_CustomCursor_0:ResetCursorImage()
+		end)
+	end
+	var235:Add(arg234.AncestryChanged:Connect(function(_, arg240)
+		
+		if arg240 == nil then
+			var235:Destroy()
+		end
+	end))
+end
+function var32.OnStart(_)
+	
+	var19 = require(game.ReplicatedStorage.Util)
+	var31 = require(game.ReplicatedStorage.Effect)
+	var22.RegisterAttackEvent = r_Net_0:RemoteEvent("RegisterAttack")
+	var22.CancelEquipAnimEvent = r_Net_0:RemoteEvent("CancelEquipAnim")
+	var22.EquipAnimApplyEndStateEvent = r_Net_0:RemoteEvent("EquipAnimApplyEndState")
+	var22.VisualEquippedEvent = r_Net_0:RemoteEvent("VisualEquipped")
+	var22.VisualUnequippedEvent = r_Net_0:RemoteEvent("VisualUnequipped")
+	var22.ShootGunEvent = r_Net_0:RemoteEvent("ShootGunEvent")
+	var22.ReceivedHit = r_Net_0:RemoteEvent("ReceivedHit")
+	var22.PlayAttackStartEffectEvent = r_Net_0:RemoteEvent("PlayAttackStartEffect")
+	local var242 = var13.Character
+	if var242 then
+		task.defer(var241, var242)
+	end
+	game.Players.LocalPlayer.CharacterAdded:Connect(var241)
+	workspace.Characters.ChildAdded:Connect(var241)
+	workspace.Enemies.ChildAdded:Connect(var241)
+	var22.CancelEquipAnimEvent.OnClientEvent:Connect(function(arg243)
+		
+		local var244 = var20[arg243]
+		if var244 then
+			var244:cancel()
+			var20[arg243] = nil
+		end
+	end)
+	var22.ReceivedHit.OnClientEvent:Connect(function(arg245, arg246, arg247, arg248, arg249)
+		
+		if arg245 == var13.Character then
+			r_CombatUtil_0:ApplyDamageHighlight(var13.Character, arg246, arg247, arg248, arg249)
+		elseif arg248 == "Sword" or arg248 == "Melee" then
+			r_CombatUtil_0:PlayMeleeHitParticles(arg245, arg249, arg247)
+		end
+	end)
+	var22.PlayAttackStartEffectEvent.OnClientEvent:Connect(function(_, arg250, arg251)
+		
+		r_CombatUtil_0:AttackStart(arg250, arg251)
+	end)
+end
+return var32

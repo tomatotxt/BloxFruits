@@ -1,0 +1,1089 @@
+-- Decompiled by the Arcadia Luau Decompiler
+
+game:GetService("ReplicatedStorage")
+local l_TweenService_0 = game:GetService("TweenService")
+local l_RunService_0 = game:GetService("RunService")
+local l_Players_0 = game:GetService("Players")
+require(game.ReplicatedStorage.Modules.AnimationUtil)
+local r_WeaponData_0 = require(game.ReplicatedStorage.Modules.WeaponData)
+local r_Flags_0 = require(game.ReplicatedStorage.Modules.Flags)
+local r_Net_0 = require(game.ReplicatedStorage.Modules.Net)
+local r_Util_0 = require(game.ReplicatedStorage.Modules.Util.Util)
+local var8 = {}
+local var9 = game.Players.LocalPlayer
+local var10 = workspace.Enemies
+local var11 = workspace.Characters
+local r_WrapHighlight_0 = require(game.ReplicatedStorage.Util.WrapHighlight)
+local var13 = l_RunService_0:IsServer()
+local var14 = {}
+local var15 = nil
+local var16 = nil
+task.defer(function()
+	
+	var15 = require(game.ReplicatedStorage.Util)
+	var16 = require(script.Particle)
+	var14.RegisterHitEvent = r_Net_0:RemoteEvent("RegisterHit", true)
+	var14.ReceivedHit = r_Net_0:RemoteEvent("ReceivedHit")
+end)
+function var8.GetPureWeaponName(_, arg17)
+	return string.lower(string.gsub(arg17, "%s", ""))
+end
+function var8.GetComboPaddingTime(_)
+	return 0.3
+end
+function var8.GetDefaultAOEDelay(_)
+	return 0.35
+end
+function var8.GetAttackCancelMultiplier(_)
+	return 0.8
+end
+local r_IsTransformed_0 = require(game.ReplicatedStorage.Util.IsTransformed)
+function var8.HasRigEquipped(_, arg19)
+	
+	if arg19:FindFirstChild("HumanoidRootPart") and arg19.HumanoidRootPart:FindFirstChild("Buddha") then
+		return false
+	else
+		return r_IsTransformed_0(arg19, false, false)
+	end
+end
+function var8.CanAttack(_, arg20, arg21)
+	
+	if (_G.tapCooldown or 0) > os.clock() then
+		return
+	else
+		local var22
+		if arg20 then
+			var22 = arg20:FindFirstChildWhichIsA("Humanoid")
+		else
+			var22 = arg20
+		end
+		if var22 and var22.Health > 0 then
+			local var23 = arg20:FindFirstChild("Stun")
+			local var24 = arg20:FindFirstChild("Busy")
+			if var22.Sit and (arg21 == "Sword" or (arg21 == "Melee" or arg21 == "Gun")) then
+				return
+			elseif (not var23 or var23.Value <= 0) and not (var24 and var24.Value) then
+				if not var8:HasRigEquipped(arg20) then
+					return true
+				end
+			end
+		else
+			return
+		end
+	end
+end
+function var8.IsVulnerable(_, arg25)
+	
+	if arg25 then
+		local var26
+		if arg25 then
+			var26 = arg25:FindFirstChildWhichIsA("Humanoid")
+		else
+			var26 = arg25
+		end
+		local var27 = var26.Health > 0
+		if l_RunService_0:IsServer() then
+			local var28 = _G.getWrappedPlayer(l_Players_0:GetPlayerFromCharacter(arg25))
+			if var28 and var28:dodging() then
+				return false
+			end
+		end
+		return var27
+	end
+end
+function var8.GetRigOfHitPart(_, arg29)
+	
+	local var30 = arg29:FindFirstAncestorWhichIsA("Tool")
+	if var30 then
+		return var30.Parent
+	end
+	for _, var31 in { var10, var11 } do
+		for _, var32 in var31:GetChildren() do
+			if arg29:IsDescendantOf(var32) then
+				return var32
+			end
+		end
+	end
+end
+local var33 = {
+	"RightUpperArm",
+	"RightLowerArm",
+	"RightHand",
+	"RightUpperLeg",
+	"RightLowerLeg",
+	"RightFoot",
+	"LeftUpperArm",
+	"LeftLowerArm",
+	"LeftHand",
+	"LeftUpperLeg",
+	"LeftLowerLeg",
+	"LeftFoot",
+	"UpperTorso",
+	"LowerTorso",
+	"Head",
+	"ModelHitbox"
+}
+local var34 = var16
+local var35 = var15
+local var36 = {}
+local var37 = nil
+local var38 = false
+for _, var39 in var33 do
+	var36[var39] = true
+end
+local function var43(arg40, arg41)
+	
+	for var42 = #arg40, 1, -1 do
+		if arg40[var42] == arg41 then
+			table.remove(arg40, var42)
+			break
+		end
+	end
+	var37.FilterDescendantsInstances = arg40
+end
+function var8.GetHitDetectionParams(_)
+	
+	if var38 then
+		return var37
+	end
+	var38 = true
+	var37 = OverlapParams.new()
+	var37.FilterType = Enum.RaycastFilterType.Include
+	local function var60(arg44)
+		
+		local var45 = {}
+		local function var48(arg46)
+			
+			if table.find(var33, arg46.Name) ~= nil then
+				var37:AddToFilter(arg46)
+				local var47 = var45
+				table.insert(var47, arg46)
+			end
+		end
+		local var49 = var45
+		for _, var50 in arg44:GetChildren() do
+			if table.find(var33, var50.Name) ~= nil then
+				var37:AddToFilter(var50)
+				table.insert(var49, var50)
+			end
+		end
+		local var51 = {}
+		local var52 = var51
+		local var53 = arg44.ChildAdded
+		table.insert(var52, var53:Connect(var48))
+		local function var57(_, arg54)
+			
+			if arg54 == nil then
+				for _, var55 in var49 do
+					var43(var37.FilterDescendantsInstances, var55)
+				end
+				var49 = nil
+				for _, var56 in var51 do
+					var56:Disconnect()
+				end
+				var51 = nil
+			end
+		end
+		local var58 = var51
+		local var59 = arg44.AncestryChanged
+		table.insert(var58, var59:Connect(var57))
+	end
+	for _, var61 in var10:GetChildren() do
+		var60(var61)
+	end
+	var10.ChildAdded:Connect(var60)
+	local function var63(arg62)
+		
+		if var9 ~= arg62 then
+			if arg62.Character then
+				var60(arg62.Character)
+			end
+			arg62.CharacterAdded:Connect(var60)
+		end
+	end
+	for _, var64 in game.Players:GetPlayers() do
+		task.defer(var63, var64)
+	end
+	game.Players.PlayerAdded:Connect(var63)
+	return var37
+end
+local var65 = {}
+function var8.ToggleLoadMovesetAnims(_, arg66, arg67, arg68)
+	
+	for var69, var70 in arg67.WeaponType == "Gun" and arg67.Moveset or arg67.Moveset.Basic do
+		local var71
+		if arg67.Moveset.Basic then
+			var71 = var8:GetPureWeaponName(arg67.Name) .. "-basic" .. var69
+		else
+			var71 = var8:GetPureWeaponName(arg67.Name) .. "-" .. var69
+		end
+		if arg68 then
+			if not var65[arg66] then
+				var65[arg66] = {}
+			end
+			local var72 = var70.Looped
+			local var73 = var35.Anims:Get(arg66.Parent, var70.AnimationId)
+			if var73 then
+				var73._Object.Name = var71
+				if string.match(var71, "Idle") then
+					var73._Object.Looped = true
+				else
+					var73._Object.Looped = var72
+					var73._Object.Priority = Enum.AnimationPriority.Action
+					var73._Object:SetAttribute("SpeedMult", var70.SpeedMult)
+				end
+				var65[arg66][var71] = var73
+			end
+		elseif var65[arg66] then
+			local var74 = var65[arg66][var71]
+			if var74 then
+				var74:Stop()
+				if typeof(var74) == "Instance" then
+					var74:Destroy()
+				else
+					var74.Animation:Destroy()
+				end
+			end
+			var65[arg66][var71] = nil
+			if not next(var65[arg66]) then
+				var65[arg66] = nil
+			end
+		end
+	end
+end
+function var8.GetMovesetAnimCache(_, arg75)
+	
+	return var65[arg75]
+end
+function var8.GetLoadedAnimsFor(_, arg76, arg77)
+	
+	local var78 = var8:GetPureWeaponName(arg76)
+	local var79 = {}
+	local var80 = var8:GetMovesetAnimCache(arg77)
+	if var80 then
+		for var81, var82 in var80 do
+			local var83, var84 = string.match(var81, "(.+)-(.+)")
+			if var83 == var78 then
+				var79[var84] = var82
+			end
+		end
+	end
+	return var79
+end
+function var8.AttackStart(_, arg85, arg86)
+	
+	if arg85 and arg85.Parent then
+		local var87 = arg85.Parent:FindFirstChild("Humanoid")
+		if var87 then
+			var87 = var87.RootPart
+		end
+		local var88
+		if var87 then
+			var88 = var87.Parent
+		else
+			var88 = var87
+		end
+		if var88 then
+			local r_Effect_0 = require(game.ReplicatedStorage.Effect)
+			local var90 = var88:FindFirstChild("EquippedWeapon")
+			local var91 = var8:GetWeaponName(var90 or arg85)
+			local var92 = var8:GetPureWeaponName(var91)
+			local var93 = var8:GetWeaponData(var91)
+			local var94 = var93.Moveset
+			local var95 = var94.Basic
+			local var96 = ("Couldn\'t find the \'Basic\' moveset for %*"):format(var91)
+			assert(var95, var96)
+			local var97 = var94.Basic[arg86]
+			local var98 = var93.VFXDelay or var97.VFXDelay
+			local var99 = var88:IsDescendantOf(var10)
+			if var90 then
+				for _, var100 in var90:GetDescendants() do
+					if var100:IsA("Trail") and var92 ~= "dragontalon" then
+						var100.Enabled = true
+					elseif var100.Name == "HitEffect" and var100:IsA("ParticleEmitter") then
+						task.delay(var98 or 0.25, function()
+							
+							var100:Emit(var100:GetAttribute("EmitCount") or 1)
+						end)
+					end
+				end
+				local var101 = var9
+				if var101 then
+					var101 = var88 ~= var9.Character
+				end
+				if var99 or var101 then
+					task.delay(0.75, function()
+						
+						for _, var102 in var90:GetDescendants() do
+							if var102:IsA("Trail") then
+								var102.Enabled = false
+							end
+						end
+					end)
+				end
+			end
+			if var92 == "superhuman" or var92 == "godhuman" then
+				task.delay(0.25, function()
+					
+					r_Effect_0.new("Chop.Punch"):play({
+						["Character"] = var88,
+						["God"] = var92 == "godhuman"
+					})
+				end)
+			elseif var92 == "divineart" then
+				task.defer(function()
+					
+					local var103 = {
+						["hrp"] = var87,
+						["index"] = arg86
+					}
+					r_Effect_0.new("Angel.M1"):play(var103)
+				end)
+			elseif var92 == "flail" then
+				task.delay(0.3, function()
+					
+					local var104 = {
+						["Character"] = var88,
+						["God"] = true
+					}
+					r_Effect_0.new("Chop.Punch"):play(var104)
+				end)
+			elseif var92 == "dragontalon" then
+				task.defer(function()
+					
+					task.delay(0.25, function()
+						
+						local var105 = {
+							["Root"] = var87,
+							["Index"] = arg86
+						}
+						r_Effect_0.new("DragonTalon.M1"):play(var105)
+					end)
+				end)
+			elseif var92 == "sanguineart" then
+				task.defer(function()
+					
+					local var106 = {
+						["Root"] = var87,
+						["Combo"] = arg86
+					}
+					r_Effect_0.new("Ghoul.M1"):play(var106)
+				end)
+			elseif var92 == "anchor" then
+				task.defer(function()
+					
+					local var107 = Instance.new("Animation")
+					var107.AnimationId = "rbxassetid://14798724768"
+					local var108 = Instance.new("Animation")
+					var108.AnimationId = "rbxassetid://14798726082"
+					local var109 = Instance.new("Animation")
+					var109.AnimationId = "rbxassetid://14798728487"
+					local var110 = Instance.new("Animation")
+					var110.AnimationId = "rbxassetid://14798729807"
+					var90.Right.Anchor.AnimationController:LoadAnimation(({
+						var107,
+						var108,
+						var109,
+						var110
+					})[arg86]):Play()
+					task.delay(0.2, function()
+						
+						var35.Sound:Play("SwordSwing", var88.HumanoidRootPart)
+					end)
+					if arg86 == 4 and var88 == var9.Character then
+						task.delay(0.2, function()
+							
+							var35.BodyMover.new(var88):Create("BodyVelocity", {
+								["Velocity"] = var88.HumanoidRootPart.CFrame.lookVector * 100,
+								["Duration"] = 0.15
+							})
+						end)
+					end
+				end)
+			end
+			local var111 = var97.PushDelay
+			local var112 = var97.PushForce
+			if var111 or var112 then
+				task.delay(var111 or 0.2, function()
+					
+					var35.BodyMover.new(var88):Create("BodyVelocity", {
+						["Velocity"] = var87.CFrame.LookVector * var112,
+						["Duration"] = 0.15
+					})
+				end)
+			end
+			task.delay(var111 or 0.2, function()
+				
+				var35.Sound:Play(var93.SwingSound or "SwordSwing", var87)
+			end)
+			local var113 = var97.AOEDelay
+			local var114 = var97.AOEDistanceFromCharacter
+			if (var113 or var114) and not var97.CustomAOEVFX then
+				task.delay(var113 or var8:GetDefaultAOEDelay(), function()
+					
+					local var115 = var35.Ray
+					local var116 = var87.CFrame
+					local var117 = -(var114 or 7.5)
+					local var118, var119 = var115(var116 * Vector3.new(0, 0, var117), Vector3.new(0, -4, 0), { workspace.Characters, var10 })
+					if var118 then
+						local var120 = {
+							["Character"] = var88,
+							["PreviousPosition"] = nil,
+							["Position"] = var119
+						}
+						r_Effect_0.new("Rubber.Transformed.Axe"):play(var120)
+					end
+				end)
+			end
+		end
+	else
+		return
+	end
+end
+function var8.CanCharacterMeleeAoe(_, arg121)
+	if arg121 then
+		arg121 = arg121:FindFirstChild("HumanoidRootPart")
+	end
+	if arg121 then
+		arg121 = arg121:FindFirstChild("Buddha")
+	end
+	return arg121 and 10 or 1
+end
+local var130 = coroutine.create(function()
+	
+	local var128, var129 = pcall(function()
+		
+		repeat
+			task.wait()
+		until var14.RegisterHitEvent
+		local var122 = game.Players.LocalPlayer.UserId
+		local var123 = tostring(var122):sub(2, 4)
+		local var124 = coroutine.running
+		local var125 = var123 .. tostring(var124()):sub(11, 15)
+		var14.RegisterHitEvent:FireServer(var125)
+		while true do
+			local var126, var127 = coroutine.yield()
+			var14.RegisterHitEvent:FireServer(var126, var127, nil, var125)
+		end
+	end)
+	if not var128 then
+		warn(var129)
+	end
+end)
+if not var13 then
+	function _G.checkHits() end
+	function _G.SendHitsToServer(...)
+		
+		_G.checkHits(...)
+		coroutine.resume(var130, ...)
+	end
+	coroutine.resume(var130)
+end
+local var131 = {}
+local function var140(arg132, arg133, arg134, arg135, arg136)
+	
+	if var13 then
+		require(game.ServerScriptService.Services.CombatService):RegisterHit(arg132, arg134)
+	else
+		if arg136 then
+			for _, var137 in pairs(arg136) do
+				local var138 = var131
+				table.insert(var138, var137)
+			end
+			local var139 = var131
+			table.insert(var139, { arg133, arg134 })
+		end
+		if arg132 == true then
+			if #var131 > 0 then
+				if r_Flags_0.COMBAT_REMOTE_THREAD then
+					coroutine.resume(var130, table.remove(var131, 1)[2], var131)
+				else
+					var14.RegisterHitEvent:FireServer(table.remove(var131, 1)[2], var131)
+				end
+			end
+			table.clear(var131)
+		end
+		if arg132 ~= true then
+			var8:ApplyDamageHighlight(arg133, arg132, arg135.Name, arg135.WeaponType, arg134)
+		end
+	end
+end
+function var8.GetAttackAngle(_, arg141, arg142)
+	local var143 = arg141.HumanoidRootPart.CFrame.LookVector:Dot((arg142.HumanoidRootPart.Position - arg141.HumanoidRootPart.Position).unit)
+	return math.acos(var143)
+end
+function var8.RunHitDetection(_, arg144, arg145, arg146)
+	
+	local var147 = arg144.Parent
+	local var148 = l_Players_0:GetPlayerFromCharacter(var147)
+	local var149 = var147.HumanoidRootPart
+	local var150 = var147.UpperTorso
+	local var151 = var147.RightFoot
+	local var152 = var147.Humanoid
+	local var153 = var147:FindFirstChild("EquippedWeapon") or var8:GetEquippedWeaponTool(var147)
+	local var154 = var8:GetWeaponName(var153)
+	local var155 = var8:GetWeaponData(var154)
+	local var156 = var155.WeaponType == "Melee"
+	local var157 = var153:IsDescendantOf(var10)
+	if var157 then
+		var157 = not var147:FindFirstChild("Summoner")
+	end
+	local var158 = var147:FindFirstChild("Summoner")
+	local var159 = var155.Moveset.Basic
+	local var160 = ("Couldn\'t find the \'Basic\' moveset for %*"):format(var154)
+	assert(var159, var160)
+	if var159[arg145].AOEDelay ~= nil then
+		return
+	end
+	local var161 = {}
+	if var156 then
+		for _, var162 in var147:GetChildren() do
+			if var162:HasTag("WeaponHitbox") or var162:HasTag("Blade") then
+				table.insert(var161, var162)
+			end
+		end
+	end
+	for _, var163 in var153:GetDescendants() do
+		if var163:HasTag("WeaponHitbox") or var163:HasTag("Blade") then
+			table.insert(var161, var163)
+		end
+	end
+	local var164 = {}
+	local var165 = {}
+	local var166 = var8:CanCharacterMeleeAoe(var147)
+	local function var177(arg167)
+		
+		local var168 = nil
+		local var169 = nil
+		for _, var170 in arg167 do
+			local var171 = var8:GetRigOfHitPart(var170)
+			if var171 then
+				if var36[var170.Name] then
+					local var172 = var171:FindFirstChild("Summoner")
+					local var173 = var147:FindFirstChild("Summoner")
+					if (not var173 or var171 ~= var173.Value.Character) and (not var148 or (not var172 or var172.Value ~= var148)) then
+						if var155.ValidateFrontHits then
+							local _ = var149.CFrame.Position
+							local _ = var171.PrimaryPart.CFrame.Position
+							if var8:GetAttackAngle(var147, var171) <= 1.3 then
+								goto l12
+							end
+						else
+							::l12::
+							if (not var157 or (not var171:IsDescendantOf(workspace.Enemies) or (var173 or var172))) and (var171 ~= var147 and var8:IsVulnerable(var171)) then
+								if var168 then
+									if var166 > #var165 and (var170.Parent ~= var168 and not table.find(var165, var170.Parent)) then
+										local var174 = var164
+										table.insert(var174, { var171, var170 })
+										local var175 = var165
+										table.insert(var175, var171)
+									end
+								else
+									local var176 = var165
+									table.insert(var176, var171)
+									var169 = var170
+									var168 = var171
+								end
+							end
+						end
+					end
+				end
+			else
+				warn("No rig found for hit part:", var170)
+			end
+		end
+		if var168 then
+			var140(var147, var168, var169, var155, var164)
+		end
+		return var168, var169
+	end
+	local var178 = nil
+	local var179
+	if r_Flags_0.NEW_COMBAT_SYSTEM_VISUALIZE_HITBOXES then
+		var179 = Instance.new("Part")
+		var179.Name = "BroadphaseHitboxPart"
+		var179.BrickColor = BrickColor.new("Bright red")
+		var179.Transparency = 0.8
+		var179.CanCollide = false
+		var179.CanTouch = false
+		var179.CanQuery = false
+		var179.Anchored = true
+		var179.Parent = workspace
+	else
+		var179 = nil
+	end
+	local var180 = var147.HumanoidRootPart:FindFirstChild("Buddha2")
+	local var181 = (var180 or var147.HumanoidRootPart:FindFirstChild("Buddha")) and true or false
+	local var182 = var149.Size.Y * 0.5 + var152.HipHeight + 0.5
+	local var183 = arg146._Object.Length
+	local var184 = 0
+	local var185 = nil
+	local var186 = {}
+	while var184 < var183 and (arg146._Object.IsPlaying and not var185) do
+		var184 = var184 + task.wait()
+		if var153 and not var153:IsDescendantOf(workspace) then
+			break
+		end
+		if var184 >= 0.13 then
+			local var187 = var149.CFrame
+			local var188 = var187.Position
+			local var189 = var150.Size.X
+			local var190 = var187 * Vector3.new(var189, 0, 0)
+			local var191 = var184 / var183
+			local var192 = math.clamp(var191, 0, 1)
+			local _ = var192 * var182
+			local var193 = var151.Position
+			local var194 = var151.Size.Y * 0.5
+			local var195 = var193 - Vector3.new(0, var194, 0)
+			local var196 = var188.X
+			local var197 = var195.Y
+			local var198 = var188.Z
+			local var199 = var190:Lerp(Vector3.new(var196, var197, var198), var192)
+			local var200, var201 = r_Util_0:GetBoundingBox(var161)
+			local var202 = r_Util_0:GetCornersOfPart({
+				["CFrame"] = var200,
+				["Size"] = var201
+			})
+			local var203 = { var190, var199, unpack(var202) }
+			for var204 = #var186, #var186 + 1 - 30, -1 do
+				local var205 = var186[var204]
+				if var205 then
+					for _, var206 in var205 do
+						local var207 = var187 * var206
+						table.insert(var203, var207)
+					end
+				end
+			end
+			local var208 = {}
+			for _, var209 in var202 do
+				table.insert(var208, var187:ToObjectSpace(var209))
+			end
+			table.insert(var186, var208)
+			local var210, var211 = r_Util_0:GetBoundingBox(var203)
+			local var212 = var210 * (var187 - var188)
+			local var213 = var211 * (var149:GetAttribute("HrpSizeScale") or 1)
+			local var214
+			if var157 then
+				var214 = not var158
+			else
+				var214 = var157
+			end
+			if var214 then
+				var213 = var213 * 0.5
+			end
+			local var215 = var149.Size * (var149:GetAttribute("HrpSizeScale") or 1)
+			if var181 then
+				if var156 then
+					var213 = Vector3.new(4.25, 3, 4) * 2.5 * var215.Y / 2
+					local var216 = var155.HitboxMagnitude
+					if var216 then
+						var213 = var213 * (1 + (var216 - 2) * 0.1)
+					end
+					if var180 then
+						var213 = var213 * Vector3.new(1, 1, 0.875)
+					end
+					var212 = var149.CFrame * CFrame.new(0, -var213.Y * 0.125, -var213.Z / 3.25)
+				else
+					local var217 = var213.X
+					local var218 = var215.Y * 4
+					local var219 = var213.Y
+					local var220 = math.max(var218, var219)
+					local var221 = var213.Z
+					var213 = Vector3.new(var217, var220, var221)
+				end
+			end
+			if var179 then
+				var179.CFrame = var212
+				var179.Size = var213
+			end
+			local var222 = workspace:GetPartBoundsInBox(var212, var213, var37)
+			if var181 and var156 == false then
+				local var223 = Vector3.new(4.25, 3, 4) * 2.5 * var215.Y / 2
+				local var224 = var155.HitboxMagnitude
+				if var224 then
+					var223 = var223 * (1 + (var224 - 2) * 0.1)
+				end
+				if var180 then
+					var223 = var223 * Vector3.new(1, 1, 0.875)
+				end
+				local var225 = var149.CFrame * CFrame.new(0, -var223.Y * 0.125, -var223.Z / 3.25)
+				if r_Flags_0.NEW_COMBAT_SYSTEM_VISUALIZE_HITBOXES and not var178 then
+					var178 = Instance.new("Part")
+					var178.Name = "BroadphaseHitboxPart"
+					var178.BrickColor = BrickColor.new("Bright red")
+					var178.Transparency = 0.8
+					var178.CanCollide = false
+					var178.CanTouch = false
+					var178.CanQuery = false
+					var178.Anchored = true
+					var178.CFrame = var225
+					var178.Size = var223
+					var178.Parent = workspace
+				end
+				if var178 then
+					var178.CFrame = var225
+					var178.Size = var223
+				end
+				for _, var226 in pairs(workspace:GetPartBoundsInBox(var225, var223, var37)) do
+					table.insert(var222, var226)
+				end
+			end
+			local var227
+			var185, var227 = var177(var222)
+			if var185 then
+				local var228 = l_Players_0:GetPlayerFromCharacter(var185)
+				if var13 and var228 then
+					local var229 = var227.Position
+					for _, var230 in l_Players_0:GetPlayers() do
+						local var231 = var230.Character
+						if var230 ~= var148 and (var231 and (var231:GetPivot().Position - var229).Magnitude <= 300) then
+							var14.ReceivedHit:FireClient(var228, var185, var231, var155.Name, var155.WeaponType, var227)
+						end
+					end
+				end
+			end
+			if not var181 or var156 == false then
+				for _, var232 in var161 do
+					local var233 = var232.Size
+					local var234
+					if var214 then
+						var234 = var233 * 0.5
+					else
+						local var235 = var155.HitboxMagnitude
+						if var235 then
+							var233 = var233 + Vector3.one * var235
+						end
+						if var156 then
+							var233 = var233 + Vector3.new(2, 2, 2)
+						end
+						if var147.HumanoidRootPart:FindFirstChild("Buddha2") then
+							var233 = var233 * 1.5
+						elseif var147.HumanoidRootPart:FindFirstChild("Buddha") then
+							var233 = var233 * 1.2
+						end
+						local var236 = var233.X
+						local var237 = math.max(3, var236)
+						local var238 = var233.Y
+						local var239 = math.max(3, var238)
+						local var240 = var233.Z
+						local var241 = math.max(3, var240)
+						var234 = Vector3.new(var237, var239, var241)
+					end
+					if r_Flags_0.NEW_COMBAT_SYSTEM_VISUALIZE_HITBOXES then
+						local var242 = Instance.new("Part")
+						var242.BrickColor = BrickColor.new("Bright red")
+						var242.Transparency = 0.5
+						var242.CanCollide = false
+						var242.CanTouch = false
+						var242.CanQuery = false
+						var242.Anchored = true
+						var242.CFrame = var232.CFrame
+						var242.Size = var234
+						var242.Parent = workspace
+						task.delay(0, function()
+							
+							var242:Destroy()
+						end)
+					end
+					local var243
+					var185, var243 = var177((workspace:GetPartBoundsInBox(var232.CFrame, var234, var37)))
+					if var185 then
+						local var244 = l_Players_0:GetPlayerFromCharacter(var185)
+						if var13 and var244 then
+							local var245 = var243.Position
+							for _, var246 in l_Players_0:GetPlayers() do
+								local var247 = var246.Character
+								if var246 ~= var148 and (var247 and (var247:GetPivot().Position - var245).Magnitude <= 300) then
+									var14.ReceivedHit:FireClient(var244, var185, var247, var155.Name, var155.WeaponType, var243)
+								end
+							end
+						end
+						break
+					end
+				end
+			end
+		end
+	end
+	if var148 == game.Players.LocalPlayer then
+		var140(true)
+	end
+	if r_Flags_0.NEW_COMBAT_SYSTEM_VISUALIZE_HITBOXES then
+		task.delay(0.1, function()
+			
+			var179:Destroy()
+		end)
+		if var178 then
+			task.delay(0.1, function()
+				
+				var178:Destroy()
+			end)
+		end
+	end
+end
+function var8.GetWeaponData(_, arg248)
+	
+	for _, var249 in {
+		arg248,
+		var8:GetPureWeaponName(arg248),
+		string.gsub(arg248, "%s", ""),
+		string.lower(arg248),
+		string.lower(arg248:sub(1, 1)) .. arg248:sub(2, #arg248),
+		string.upper(arg248:sub(1, 1)) .. arg248:sub(2, #arg248)
+	} do
+		local var250 = r_WeaponData_0[var249]
+		if var250 then
+			return var250
+		end
+	end
+end
+function var8.GetWeaponName(_, arg251)
+	return arg251:GetAttribute("WeaponName") or arg251.Name
+end
+function var8.GetWeaponModel(_, arg252, arg253)
+	
+	local var254 = var8:GetPureWeaponName(arg253)
+	for _, var255 in arg252:GetChildren() do
+		if var8:GetPureWeaponName(var255.Name) == var254 then
+			return var255
+		end
+	end
+end
+function var8.GetEquippedWeaponTool(_, arg256)
+	for _, var257 in arg256:GetChildren() do
+		if var257:IsA("Tool") and (var257:HasTag("MeleeTool") or var257:HasTag("GunTool")) then
+			return var257
+		end
+	end
+end
+function var8.CreateShootAngles(_, arg258)
+	if arg258.NoSpread then
+		return {
+			{
+				["Angle"] = CFrame.Angles(0, 0, 0)
+			}
+		}
+	end
+	local var259 = {}
+	local var260 = Random.new(arg258.Seed)
+	local var261 = arg258.BulletSpreadCount or 7
+	local var262 = arg258.BulletSpreadDegree or 12
+	local function var271()
+		
+		local var263 = var260:NextNumber(-var262 / 2, var262 / 2)
+		local var264 = math.rad(var263)
+		local var265 = var260:NextNumber(-var262 / 2, var262 / 2)
+		local var266 = math.rad(var265)
+		local var267 = var260:NextNumber(-var262 / 2, var262 / 2)
+		local var268 = math.rad(var267)
+		local var269 = var259
+		local var270 = {
+			["Angle"] = CFrame.Angles(var264, var266, var268)
+		}
+		table.insert(var269, var270)
+	end
+	if arg258.BulletSpreadCount == 1 then
+		var271()
+		return var259
+	end
+	local var272 = {
+		["Angle"] = CFrame.Angles(0, 0, 0)
+	}
+	table.insert(var259, var272)
+	for _ = 1, var261 - 1 do
+		var271()
+	end
+	return var259
+end
+function var8.GetToolOfWeaponType(_, arg273, arg274)
+	
+	local var275 = l_Players_0:GetPlayerFromCharacter(arg273)
+	if var275 then
+		for _, var276 in var275.Backpack:GetChildren() do
+			if var276:IsA("Tool") and var276:GetAttribute("WeaponType") == arg274 then
+				return var276
+			end
+		end
+	end
+	local var277 = arg273:FindFirstChildWhichIsA("Tool")
+	if var277 and var277:GetAttribute("WeaponType") == arg274 then
+		return var277
+	end
+end
+function var8.PlayMeleeHitParticles(_, arg278, arg279, arg280)
+	
+	task.defer(function()
+		
+		local var281 = arg279 and arg279.Position or arg278:GetPivot().Position
+		local var282 = var8:GetWeaponData(arg280)
+		var34.play("Hit", var281, var282.HitSound)
+	end)
+end
+function var8.ApplyDamageHighlight(_, arg283, arg284, arg285, arg286, arg287, _)
+	
+	if var8:HasRigEquipped(arg283) then
+		return
+	else
+		local var288 = l_Players_0:GetPlayerFromCharacter(arg283)
+		local var289 = l_Players_0:GetPlayerFromCharacter(arg284)
+		if var288 or var289 then
+			if not (var288 and (var289 and _G.InSafeZone)) then
+				if var288 then
+					if var288:GetAttribute("PvpDisabled") then
+						return
+					end
+					if var288:GetAttribute("KenActive") then
+						local var290 = var288:GetAttribute("KenDodgesLeft") or 0
+						local var291 = var288:GetAttribute("LastKenDodge") or 0
+						local var292 = tick() - var291 <= 0.4
+						if var290 > 0 or var292 then
+							return
+						end
+					end
+				end
+				local var293
+				if arg284 and arg284:IsDescendantOf(var10) then
+					var293 = arg284
+				else
+					var293 = nil
+				end
+				local var294
+				if arg283 and arg283:IsDescendantOf(var10) then
+					var294 = arg283
+				else
+					var294 = nil
+				end
+				local var295 = var293 and var293:GetAttribute("Level")
+				if not var295 then
+					if var294 then
+						var295 = var294:GetAttribute("Level")
+					else
+						var295 = var294
+					end
+				end
+				local var296 = var293 and var293:GetAttribute("IsBoss")
+				if not var296 then
+					if var294 then
+						var296 = var294:GetAttribute("IsBoss")
+					else
+						var296 = var294
+					end
+				end
+				local var297
+				if var289 then
+					var297 = var289:FindFirstChild("Data")
+				else
+					var297 = var289
+				end
+				local var298
+				if var288 then
+					var298 = var288:FindFirstChild("Data")
+				else
+					var298 = var288
+				end
+				local var299 = var297 and var297.Level.Value or (var293 and var295 and var295 or 1)
+				local var300 = var298 and var298.Level.Value or var294 and var295
+				local var301 = (var299 / 175) ^ 1.5
+				local var302 = math.floor(var301) * 2
+				local var303 = nil
+				if var289 then
+					local var304 = var8:GetToolOfWeaponType(arg284, "Melee")
+					if var304 then
+						var303 = var304:GetAttribute("WeaponName")
+					end
+				elseif var293 then
+					var303 = var293:GetAttribute("WeaponName")
+				end
+				local var305 = var8:GetToolOfWeaponType(arg283, "Demon Fruit")
+				if arg286 == "Melee" or (arg286 == "Sword" or arg286 == "Gun") then
+					if var305 and (var305.Name == "Rubber-Rubber" and (arg286 == "Melee" and (var297 and var303 == "Electro"))) then
+						return
+					end
+					if var305 and (var305.Name == "Blade-Blade" and arg286 == "Sword") and (var293 and not var296 or not var293) then
+						if var293 and var295 <= var300 - var302 or not var293 then
+							return
+						end
+					elseif var305 and (var305.Name == "Rubber-Rubber" and arg286 == "Gun") and (var293 and not var296 or not var293) then
+						if var293 and var295 <= var300 - var302 or not var293 then
+							return
+						end
+					elseif var305 and (var305:FindFirstChild("Logia") and not arg284:GetAttribute("BusoEnabled")) then
+						if var293 and var295 <= var300 - var302 or not var293 then
+							return
+						end
+					elseif var305 and (var305:FindFirstChild("LogiaDough") and (var288 and (var288:GetAttribute("KenActive") and not arg284:GetAttribute("BusoEnabled")))) and (var293 and var295 <= var300 - var302 or not var293) then
+						return
+					end
+				end
+				if var288 or (arg283:GetAttribute("FruitType") ~= "Logia" or arg284:GetAttribute("BusoEnabled")) then
+					if arg286 ~= "Gun" then
+						var8:PlayMeleeHitParticles(arg283, arg287, arg285)
+					end
+					local var306 = arg283:FindFirstChildOfClass("Highlight")
+					if var306 then
+						if var306:GetAttribute("__FillColor") then
+							local var307 = {
+								["FillColor"] = Color3.fromRGB(138, 0, 0)
+							}
+							l_TweenService_0:Create(var306, TweenInfo.new(0.2), var307):Play()
+							task.delay(0.2, function()
+								
+								l_TweenService_0:Create(var306, TweenInfo.new(0.2), {
+									["FillColor"] = var306:GetAttribute("__FillColor")
+								}):Play()
+							end)
+						end
+						return true
+					end
+					local var308 = r_WrapHighlight_0(script.DamageHighlight):Clone()
+					var308.Parent = arg283
+					l_TweenService_0:Create(var308, TweenInfo.new(0.2), {
+						["FillTransparency"] = 0.5
+					}):Play()
+					task.delay(0.2, function()
+						
+						l_TweenService_0:Create(var308, TweenInfo.new(0.2), {
+							["FillTransparency"] = 1
+						}):Play()
+						task.wait(0.2)
+						var308:Destroy()
+					end)
+					return true
+				end
+			end
+		else
+			return
+		end
+	end
+end
+function var8.IsGunReloading(_, arg309)
+	
+	if var13 then
+		return not arg309.Enabled or (arg309:GetAttribute("IsReloading") or arg309:GetAttribute("UnequipAutoReloading"))
+	else
+		return not arg309.Enabled or (arg309:GetAttribute("IsReloading_Client") or arg309:GetAttribute("UnequipAutoReloading"))
+	end
+end
+local var310 = RaycastParams.new()
+var310.FilterType = Enum.RaycastFilterType.Exclude
+var310.FilterDescendantsInstances = { workspace._WorldOrigin, workspace.Characters, var10 }
+local var311 = RaycastParams.new()
+var311.FilterType = Enum.RaycastFilterType.Exclude
+function var8.GetTargetPosition(_, arg312, arg313, arg314, arg315)
+	
+	debug.profilebegin("GetTargetPosition")
+	local var316 = arg314 or (1 / 0)
+	local var317 = arg313 - arg312
+	if var316 < var317.Magnitude then
+		arg313 = arg312 + var317.Unit * var316
+	end
+	if arg315 then
+		var311.FilterDescendantsInstances = { workspace._WorldOrigin, arg315 }
+	end
+	local var318 = workspace:Raycast(arg312, arg313 - arg312, arg315 and var311 or var310)
+	if var318 then
+		arg313 = var318.Position
+	end
+	debug.profileend()
+	return arg313
+end
+return var8
