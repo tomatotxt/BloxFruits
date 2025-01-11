@@ -17,10 +17,9 @@ API.CombatFramework = require(ServicesAPI.ReplicatedStorage.Controllers.CombatCo
 API.CameraShaker = require(ServicesAPI.ReplicatedStorage.Util.CameraShaker.Main)
 
 -- CONSTRUCT getWeapon FUNCTION
-
+API.CurrentWeapon = nil
 local function getWeapon()
-    local Backpack = PlayerAPI.LocalPlayer.Backpack
-
+    return API.CurrentWeapon
 end
 
 getgenv().Attack = false
@@ -33,12 +32,14 @@ end
 
 ServicesAPI.RunService.RenderStepped:Connect(function()
     if FastAttack then
-        local Character = PlayerAPI.getCharacter()
+        
     end
     if Attack then
         PlayerAPI.getCharacter().Stun.Value = 0
         PlayerAPI.getCharacter().Humanoid.Sit = false
-        API.attackMelee(getWeapon())
+        local Weapon = getWeapon()
+        if not Weapon then return end
+        API.attackMelee(Weapon)
         API.CameraShaker:Stop()
     end
 end)

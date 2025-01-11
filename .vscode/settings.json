@@ -20,6 +20,7 @@
         "writefile",
         "readfile",
         "listfiles",
-        "delfile"
+        "delfile",
+        "RemoteAPI"
     ]
 }

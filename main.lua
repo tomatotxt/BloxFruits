@@ -69,21 +69,24 @@ local function main()
     return true
 end
 -- Main Loop
-local function mainloop() 
-    if OptionsAPI.getOption("AutoEquipWeapon") then
-        SafeExecute(function() 
-            local Character = PlayerAPI.getCharacter()
-            for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
-                if Tool.ToolTip == OptionsAPI.getOption("WeaponType") then
-                    Tool.Parent = Character
+local function mainloop()
+    while wait() do
+        if OptionsAPI.getOption("AutoEquipWeapon") then
+            SafeExecute(function() 
+                local Character = PlayerAPI.getCharacter()
+                for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
+                    if Tool.ToolTip == OptionsAPI.getOption("WeaponType") then
+                        Tool.Parent = Character
+                        RemoteAPI.CurrentWeapon = Tool
+                    end
                 end
-            end
-        end, "AutoEquipWeapon")
+            end, "AutoEquipWeapon")
+        end
     end
 end
 
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
 task.spawn(AutoChestFarm)
-task.spawn(function() while wait() do mainloop(); end end)
+task.spawn(mainloop)
 print("Main Loaded.")
