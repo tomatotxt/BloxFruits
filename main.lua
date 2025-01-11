@@ -69,4 +69,4 @@ wait = task.wait
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
 print("Main Loaded.")
-while wait() do mainloop(); end
+task.spawn(function() while wait() do mainloop(); end end)

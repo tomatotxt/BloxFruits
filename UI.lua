@@ -11,12 +11,12 @@ local MainWindow = ImGui:CreateWindow({
 	Size = UDim2.fromOffset(350, 300), --// Roblox property 
 	Position = UDim2.new(0.5, 0, 0, 70), --// Roblox property 
 })
+MainWindow:Center()
 
 local AutomationTab = MainWindow:CreateTab({
 	Name = "Automation",
 	Visible = true 
 })
-
 
 AutomationTab:Checkbox({
 	Label = "Chest Autofarm",
