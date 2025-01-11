@@ -43,6 +43,19 @@ local function SafeExecute(Function, OptionName)
     end
 end
 
+-- Auto Chest Farm Thread
+task.spawn(function()
+    while wait() do
+        if OptionsAPI.getOption("ChestAutoFarm") then
+            SafeExecute(function() 
+                local Chests = getChestsSorted()
+                if #Chests > 0 then
+                    TeleportAPI.Teleport(Chests[1].CFrame)
+                end
+            end, "ChestAutoFarm")
+        end
+    end
+end)
 
 
 -- Main
@@ -67,14 +80,6 @@ local function mainloop()
                 end
             end
         end, "AutoEquipWeapon")
-    end
-    if OptionsAPI.getOption("ChestAutoFarm") then
-        SafeExecute(function() 
-            local Chests = getChestsSorted()
-            if #Chests > 0 then
-                TeleportAPI.Teleport(Chests[1].CFrame)
-            end
-        end, "ChestAutoFarm")
     end
 end
 
