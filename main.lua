@@ -35,17 +35,6 @@ local function getChestsSorted()
     return Chests
 end
 
-local function main() -- Run Once
-    -- AUTO OPTIONS
-    OptionsAPI.setOption("AutoEquipWeapon", false)
-    OptionsAPI.setOption("ChestAutoFarm", false)
-    --OptionsAPI.setOption("AutoFarm", false)
-    --OptionsAPI.setOption("FruitSniper", false)
-    --OptionsAPI.setOption("Weapon", "Melee") -- Options are "Melee", "Blox Fruit", "Sword" Captilization Sensitive
-    
-    return true
-end
-
 local function SafeExecute(Function, OptionName)
     local Success, Error = pcall(Function)
     if not Success then
@@ -54,12 +43,26 @@ local function SafeExecute(Function, OptionName)
     end
 end
 
-local function mainloop() -- Repeat Constantly
+
+
+-- Main
+local function main()
+    -- AUTO OPTIONS
+    OptionsAPI.setOption("AutoEquipWeapon", false)
+    OptionsAPI.setOption("ChestAutoFarm", false)
+    OptionsAPI.setOption("AutoFarm", false)
+    OptionsAPI.setOption("FruitSniper", false)
+    OptionsAPI.setOption("WeaponType", "Melee") -- Options are "Melee", "Blox Fruit", "Sword" Captilization Sensitive
+    
+    return true
+end
+-- Main Loop
+local function mainloop() 
     if OptionsAPI.getOption("AutoEquipWeapon") then
         SafeExecute(function() 
             local Character = PlayerAPI.getCharacter()
             for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
-                if Tool.ToolTip == Options.Weapon then
+                if Tool.ToolTip == OptionsAPI.getOption("WeaponType") then
                     Tool.Parent = Character
                 end
             end

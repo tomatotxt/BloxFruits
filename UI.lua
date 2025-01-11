@@ -1,5 +1,5 @@
 local version = "0.0.2"
-local title = "Time Skip v" .. version
+local title = "Time Skip r" .. version
 
 -- Load main.lua
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/main.lua"))()
@@ -31,7 +31,7 @@ local AutoEquipWeapon = AutomationTab:Checkbox({
 })
 
 -- UI Update Loop
-while wait() do
+while wait(1) do
 	ChestAutoFarm:SetTicked(OptionsAPI.getOption(ChestAutoFarm))
 	AutoEquipWeapon:SetTicked(OptionsAPI.getOption(AutoEquipWeapon))
 end
