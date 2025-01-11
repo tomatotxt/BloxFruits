@@ -1,6 +1,6 @@
 local API = {}
 
-API.LocalPlayer = game:GetService("Players").LocalPlayer
+API.LocalPlayer = ServicesAPI.Players.LocalPlayer
 
 local function getCharacter()
     if not API.LocalPlayer.Character then

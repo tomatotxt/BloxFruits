@@ -12,6 +12,7 @@
         "getinfo",
         "setthreadidentity",
         "OptionsAPI",
-        "TimeSkipRan"
+        "TimeSkipRan",
+        "ServicesAPI"
     ]
 }

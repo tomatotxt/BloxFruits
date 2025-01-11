@@ -6,6 +6,7 @@ local git = function(path: string)
 end
 
 getgenv().OptionsAPI = git("API/OptionsAPI.lua")
+getgenv().ServicesAPI = git("API/ServicesAPI.lua")
 getgenv().PlayerAPI = git("API/DynamicAPI.lua")
 getgenv().TeleportAPI = git("API/TeleportAPI.lua")
 getgenv().RemoteAPI = git("API/RemoteAPI.lua")

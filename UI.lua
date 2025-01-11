@@ -14,10 +14,15 @@ local AutomationTab = MainWindow:CreateTab({
 	Visible = true 
 })
 
-AutomationTab:Checkbox({
+local ChestAutoToggle = AutomationTab:Checkbox({
 	Label = "Chest Autofarm",
 	Value = false,
 	Callback = function(self, Value)
 		OptionsAPI.setOption("ChestAutoFarm", Value)
 	end,
 })
+
+
+while wait() do
+	ChestAutoToggle:SetTicked(OptionsAPI.getOption("ChestAutoFarm"))
+end

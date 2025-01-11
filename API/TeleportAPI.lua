@@ -17,10 +17,6 @@ API.Teleport = function(Goal: CFrame, Speed)
     local RootPart = PlayerAPI.getCharacter().HumanoidRootPart
     RootPart.CFrame = CFrame.new( (RootPart.Position - Vector3.new(0, RootPart.Position.Y, 0)) + Vector3.new(0, Goal.Position.Y, 0) ) -- Set RootPart Height to Height of Goal
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
-    if Magnitude < 15 then
-        RootPart.CFrame = Goal
-        return
-    end
 
     while not (Magnitude < 1) do
         local Direction = (Goal.Position - RootPart.Position).unit

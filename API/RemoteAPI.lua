@@ -1,24 +1,20 @@
 local API = {}
 
-API.RunService = game:GetService("RunService")
-API.ReplicatedStorage = game:GetService("ReplicatedStorage")
-API.VirtualUser = game:GetService("VirtualUser")
-
 local rawAttackMelee = nil
 API.attackMelee    = nil
 for i,v in pairs(getgc()) do
    if type(v) == "function" and getinfo(v).name == "attackMelee" then
       rawAttackMelee = v
       API.attackMelee    = function(...)
-        setthreadidentity(2)
+        setthreadidentity(2) -- Weird Error if you don't set the thread identity
         rawAttackMelee(...)
         setthreadidentity(8)
       end
    end 
 end
 
-API.CombatFramework = require(API.ReplicatedStorage.Controllers.CombatController)
-API.CameraShaker = require(API.ReplicatedStorage.Util.CameraShaker.Main)
+API.CombatFramework = require(ServicesAPI.ReplicatedStorage.Controllers.CombatController)
+API.CameraShaker = require(ServicesAPI.ReplicatedStorage.Util.CameraShaker.Main)
 
 -- CONSTRUCT getWeapon FUNCTION
 
@@ -35,9 +31,9 @@ API.ToggleAttack = function()
     return Attack
 end
 
-API.RunService.RenderStepped:Connect(function()
+ServicesAPI.RunService.RenderStepped:Connect(function()
     if FastAttack then
-        
+        local Character = PlayerAPI.getCharacter()
     end
     if Attack then
         PlayerAPI.getCharacter().Stun.Value = 0
