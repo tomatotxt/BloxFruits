@@ -43,14 +43,14 @@ end
 
 local LoopRan = false
 local function mainloop() -- Repeat Constantly
-    if Options.ChestAutoFarm then
+    if OptionsAPI.getOption("ChestAutoFarm") then
         local Chests = getChestsSorted()
         if #Chests > 0 then
             TeleportAPI.Teleport(Chests[1].CFrame)
         end
         return
     end
-    if Options.AutoAttack then
+    if OptionsAPI.getOption("AutoAttack") then
         local Character = PlayerAPI.getCharacter()
         for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
             if Tool.ToolTip == Options.Weapon then

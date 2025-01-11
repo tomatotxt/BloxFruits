@@ -5,7 +5,7 @@ local git = function(path: string)
     return loadstring(game:HttpGet(result))()
 end
 
+getgenv().OptionsAPI = git("API/OptionsAPI.lua")
 getgenv().PlayerAPI = git("API/DynamicAPI.lua")
 getgenv().TeleportAPI = git("API/TeleportAPI.lua")
 getgenv().RemoteAPI = git("API/RemoteAPI.lua")
-getgenv().OptionsAPI = git("API/OptionsAPI.lua")
