@@ -29,9 +29,3 @@ local AutoEquipWeapon = AutomationTab:Checkbox({
 		OptionsAPI.setOption("AutoEquipWeapon", Value)
 	end,
 })
-
--- UI Update Loop
-while wait(1) do
-	ChestAutoFarm:SetTicked(OptionsAPI.getOption("ChestAutoFarm"))
-	AutoEquipWeapon:SetTicked(OptionsAPI.getOption("AutoEquipWeapon"))
-end
