@@ -18,13 +18,15 @@ API.Teleport = function(Goal: CFrame, Speed)
     end
     API.toggleNoclip(true)
     local RootPart = PlayerAPI.getCharacter().HumanoidRootPart
-    RootPart.CFrame = CFrame.new( (RootPart.Position - Vector3.new(0, RootPart.Position.Y, 0)) + Vector3.new(0, Goal.Position.Y, 0) ) -- Set RootPart Height to Height of Goal
+    -- Set the Y position of the Character to the Y position of the Goal.
+    RootPart.CFrame = CFrame.new( (RootPart.Position - Vector3.new(0, RootPart.Position.Y, 0)) + Vector3.new(0, Goal.Position.Y, 0) )
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
 
     while Magnitude >= 1 and INTERRUPT == false do
         API.IsTeleporting = true
         local Direction = (Goal.Position - RootPart.Position).unit
         RootPart.CFrame = RootPart.CFrame + Direction * (Speed * ServicesAPI.RunService.Heartbeat:wait())
+        RootPart.Velocity = Vector3.zero --Stop Character from moving specifically in the Y axis.
         Magnitude = (RootPart.Position - Goal.Position).Magnitude
     end
     API.IsTeleporting = false
