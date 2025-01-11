@@ -67,7 +67,7 @@ local function mainloop() -- Loops
     end
 end
 
-loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/APILoader.lua"))()
+loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 wait = task.wait
 main()
 print("Main Loaded.")
