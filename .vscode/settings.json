@@ -13,6 +13,13 @@
         "setthreadidentity",
         "OptionsAPI",
         "TimeSkipRan",
-        "ServicesAPI"
+        "ServicesAPI",
+        "isfolder",
+        "makefolder",
+        "isfile",
+        "writefile",
+        "readfile",
+        "listfiles",
+        "delfile"
     ]
 }
