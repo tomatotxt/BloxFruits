@@ -41,21 +41,32 @@ local function main() -- Run Once
     return true
 end
 
+local function SafeExecute(Function, OptionName)
+    local Success, Error = pcall(Function)
+    if not Success then
+        OptionsAPI.setOption(OptionName, false)
+        warn("Error in " .. OptionName .. ":", Error)
+    end
+end
+
 local function mainloop() -- Repeat Constantly
     if OptionsAPI.getOption("AutoEquipWeapon") then
-        local Character = PlayerAPI.getCharacter()
-        for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
-            if Tool.ToolTip == Options.Weapon then
-                Tool.Parent = Character
+        SafeExecute(function() 
+            local Character = PlayerAPI.getCharacter()
+            for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
+                if Tool.ToolTip == Options.Weapon then
+                    Tool.Parent = Character
+                end
             end
-        end
+        end, "AutoEquipWeapon")
     end
     if OptionsAPI.getOption("ChestAutoFarm") then
-        local Chests = getChestsSorted()
-        if #Chests > 0 then
-            TeleportAPI.Teleport(Chests[1].CFrame)
-        end
-        return
+        SafeExecute(function() 
+            local Chests = getChestsSorted()
+            if #Chests > 0 then
+                TeleportAPI.Teleport(Chests[1].CFrame)
+            end
+        end, "ChestAutoFarm")
     end
 end
 
