@@ -35,8 +35,8 @@ ServicesAPI.RunService.RenderStepped:Connect(function()
         
     end
     if Attack then
-        PlayerAPI.getCharacter().Stun.Value = 0
-        PlayerAPI.getCharacter().Humanoid.Sit = false
+        DynamicAPI.getCharacter().Stun.Value = 0
+        DynamicAPI.getCharacter().Humanoid.Sit = false
         local Weapon = getWeapon()
         if not Weapon then return end
         API.attackMelee(Weapon)

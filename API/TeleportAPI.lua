@@ -1,7 +1,7 @@
 local API = {}
 
 local toggleNoclip = function(Toggle: boolean)
-    for i,v in pairs(PlayerAPI.getCharacter():GetChildren()) do
+    for i,v in pairs(DynamicAPI.getCharacter():GetChildren()) do
         if v.ClassName == "Part" then
             v.CanCollide = not Toggle
         end
@@ -16,7 +16,7 @@ API.Teleport = function(Goal, Speed)
         Speed = API.DefaultSpeed 
     end
     toggleNoclip(true)
-    local RootPart = PlayerAPI.getCharacter().HumanoidRootPart
+    local RootPart = DynamicAPI.getCharacter().HumanoidRootPart
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
     -- Move RootPart to Goal Height
     RootPart.CFrame = RootPart.CFrame * CFrame.new(0, RootPart.Position.Y - Goal.Position.Y, 0)

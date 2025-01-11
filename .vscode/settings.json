@@ -1,7 +1,7 @@
 {
     "krnlLsp.diagnostics.globals": [
         "TeleportAPI",
-        "PlayerAPI",
+        "DynamicAPI",
         "owner",
         "branch",
         "Options",

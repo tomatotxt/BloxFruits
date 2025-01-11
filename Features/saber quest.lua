@@ -2,7 +2,7 @@ local Map         = workspace.Map
 local Jungle      = Map.Jungle
 local Torch = Jungle.Torch
 local QuestPlates = Jungle.QuestPlates
-local Character = PlayerAPI.getCharacter()
+local Character = DynamicAPI.getCharacter()
 local RootPart = Character.Humanoid.RootPart
 
 local function pressPlates(): boolean

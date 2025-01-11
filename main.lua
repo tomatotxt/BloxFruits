@@ -6,7 +6,7 @@ local UncheckedChests = {}
 local FirstRun = true
 
 local function DistanceFromPlrSort(ObjectList: table)
-    local RootPart = PlayerAPI.getCharacter().LowerTorso
+    local RootPart = DynamicAPI.getCharacter().LowerTorso
     table.sort(ObjectList, function(ChestA, ChestB)
         local RootPos = RootPart.Position
         local DistanceA = (RootPos - ChestA.Position).Magnitude
@@ -73,8 +73,8 @@ local function mainloop()
     while wait() do
         if OptionsAPI.getOption("AutoEquipWeapon") then
             SafeExecute(function() 
-                local Character = PlayerAPI.getCharacter()
-                for i, Tool: Tool in pairs(PlayerAPI.LocalPlayer.Backpack:GetChildren()) do
+                local Character = DynamicAPI.getCharacter()
+                for i, Tool: Tool in pairs(DynamicAPI.LocalPlayer.Backpack:GetChildren()) do
                     if Tool.ToolTip == OptionsAPI.getOption("WeaponType") then
                         Tool.Parent = Character
                         RemoteAPI.CurrentWeapon = Tool
