@@ -24,7 +24,7 @@ API.Teleport = function(Goal: CFrame, Speed)
     while Magnitude >= 1 and INTERRUPT == false do
         API.IsTeleporting = true
         local Direction = (Goal.Position - RootPart.Position).unit
-        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * wait())
+        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * ServicesAPI.RunService.Heartbeat:wait())
         Magnitude = (RootPart.Position - Goal.Position).Magnitude
     end
     API.IsTeleporting = false
