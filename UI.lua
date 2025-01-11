@@ -1,4 +1,4 @@
-local version = "0.0.1"
+local version = "0.0.2"
 local title = "Time Skip v" .. version
 
 -- Load main.lua
@@ -14,7 +14,7 @@ local AutomationTab = MainWindow:CreateTab({
 	Visible = true 
 })
 
-local ChestAutoToggle = AutomationTab:Checkbox({
+_G.ChestAutoFarm = AutomationTab:Checkbox({
 	Label = "Chest Autofarm",
 	Value = false,
 	Callback = function(self, Value)
@@ -22,7 +22,16 @@ local ChestAutoToggle = AutomationTab:Checkbox({
 	end,
 })
 
+_G.AutoEquipWeapon = AutomationTab:Checkbox({
+	Label = "Auto Equip Weapon",
+	Value = false,
+	Callback = function(self, Value)
+		OptionsAPI.setOption("AutoEquipWeapon", Value)
+	end,
+})
 
 while wait() do
-	ChestAutoToggle:SetTicked(OptionsAPI.getOption("ChestAutoFarm"))
+	for i, Option in pairs(OptionsAPI.Options) do
+		_G[Option]:SetTicked(OptionsAPI.getOption(Option))
+	end
 end

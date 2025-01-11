@@ -36,8 +36,13 @@ local function getChestsSorted()
 end
 
 local function main() -- Run Once
+    -- AUTO OPTIONS
+    OptionsAPI.setOption("AutoFarm", false)
+    OptionsAPI.setOption("ChestAutoFarm", false)
+    OptionsAPI.setOption("FruitSniper", false)
+    OptionsAPI.setOption("AutoEquipWeapon", false)
+    OptionsAPI.setOption("Weapon", "Melee") -- Options are "Melee", "Blox Fruit", "Sword" Captilization Sensitive
     
-    print("Main Loaded.")
     return true
 end
 
