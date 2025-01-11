@@ -19,9 +19,6 @@ local ChestAutoFarm = AutomationTab:Checkbox({
 	Value = false,
 	Callback = function(self, Value)
 		OptionsAPI.setOption("ChestAutoFarm", Value)
-		if Value == false then
-			TeleportAPI.InterruptTeleport()
-		end
 	end,
 })
 
