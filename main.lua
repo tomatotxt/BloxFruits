@@ -14,6 +14,7 @@ local function DistanceFromPlrSort(ObjectList: table)
         return DistanceA < DistanceB
     end)
 end
+
 local function getChestsSorted()
     if FirstRun then
         FirstRun = false
@@ -35,13 +36,11 @@ local function getChestsSorted()
 end
 
 local function main() -- Run Once
-    local CombatController = require(game:GetService("ReplicatedStorage").Controllers.CombatController)
-    for i,v in pairs(CombatController) do
-        print(i,v)
-    end
+    
     print("Main Loaded.")
     return true
 end
+
 local LoopRan = false
 local function mainloop() -- Repeat Constantly
     if Options.ChestAutoFarm then
@@ -68,6 +67,6 @@ end
 
 wait = task.wait
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
-getgenv().TimeSkipRan = main()
+main()
 print("Main Loaded.")
 while wait() do mainloop(); end

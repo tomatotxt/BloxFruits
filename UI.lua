@@ -2,9 +2,7 @@ local version = "0.0.1"
 local title = "Time Skip v" .. version
 
 -- Load main.lua
-if not TimeSkipRan then
-    loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/main.lua"))()
-end
+loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/main.lua"))()
 
 local ImGui = loadstring(game:HttpGet('https://github.com/depthso/Roblox-ImGUI/raw/main/ImGui.lua'))()
 
@@ -22,7 +20,7 @@ local AutomationTab = MainWindow:CreateTab({
 
 AutomationTab:Checkbox({
 	Label = "Chest Autofarm",
-	Value = true,
+	Value = false,
 	Callback = function(self, Value)
 		OptionsAPI.setOption("ChestAutoFarm", Value)
 	end,
