@@ -6,7 +6,7 @@ local function getEnemy()
         end
     end
 end
-loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/APILoader.lua"))()
+
 while task.wait() do
     local Enemy = getEnemy()
     if Enemy then 
