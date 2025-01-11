@@ -10,6 +10,8 @@
         "Attack",
         "FastAttack",
         "getinfo",
-        "setthreadidentity"
+        "setthreadidentity",
+        "OptionsAPI",
+        "TimeSkipRan"
     ]
 }

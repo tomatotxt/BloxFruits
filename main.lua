@@ -40,6 +40,7 @@ local function main() -- Run Once
         print(i,v)
     end
     print("Main Loaded.")
+    return true
 end
 local LoopRan = false
 local function mainloop() -- Repeat Constantly
@@ -47,9 +48,8 @@ local function mainloop() -- Repeat Constantly
         local Chests = getChestsSorted()
         if #Chests > 0 then
             TeleportAPI.Teleport(Chests[1].CFrame)
-        else
-            -- You can put serverhop here
         end
+        return
     end
     if Options.AutoAttack then
         local Character = PlayerAPI.getCharacter()
@@ -68,6 +68,6 @@ end
 
 wait = task.wait
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
-main()
+getgenv().TimeSkipRan = main()
 print("Main Loaded.")
 while wait() do mainloop(); end

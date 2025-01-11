@@ -8,9 +8,4 @@ end
 getgenv().PlayerAPI = git("API/DynamicAPI.lua")
 getgenv().TeleportAPI = git("API/TeleportAPI.lua")
 getgenv().RemoteAPI = git("API/RemoteAPI.lua")
-
-getgenv().Options = {
-    ChestAutoFarm = false,
-    AutoAttack = false,
-    Weapon = "Melee" -- Options are "Melee", "Blox Fruit" Captilization Sensitive
-}
+getgenv().OptionsAPI = git("API/OptionsAPI.lua")
