@@ -1,6 +1,6 @@
 getgenv().branch = "main"
 getgenv().owner = "ImMejor35"
-local API_VERSION = 1.1
+local API_VERSION = 1.2
 
 -- Intialize BloxFruits Folder if missing..
 if not isfolder("BloxFruits") then makefolder("BloxFruits") end

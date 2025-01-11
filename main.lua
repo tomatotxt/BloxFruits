@@ -43,8 +43,7 @@ local function SafeExecute(Function, OptionName)
     end
 end
 
--- Auto Chest Farm Thread
-task.spawn(function()
+local AutoChestFarm = function()
     while wait() do
         if OptionsAPI.getOption("ChestAutoFarm") then
             SafeExecute(function() 
@@ -55,7 +54,7 @@ task.spawn(function()
             end, "ChestAutoFarm")
         end
     end
-end)
+end
 
 
 -- Main
@@ -85,5 +84,6 @@ end
 
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
+task.spawn(AutoChestFarm)
 task.spawn(function() while wait() do mainloop(); end end)
 print("Main Loaded.")

@@ -18,7 +18,9 @@ API.Teleport = function(Goal, Speed)
     toggleNoclip(true)
     local RootPart = PlayerAPI.getCharacter().HumanoidRootPart
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
-    
+    -- Move RootPart to Goal Height
+    RootPart.CFrame = RootPart.CFrame * CFrame.new(0, RootPart.Position.Y - Goal.Position.Y, 0)
+
     while not (Magnitude < 1) do
         local Direction = (Goal.Position - RootPart.Position).unit
         RootPart.CFrame = RootPart.CFrame + Direction * (Speed * wait())
