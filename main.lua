@@ -70,7 +70,6 @@ local function mainloop() -- Repeat Constantly
     end
 end
 
-wait = task.wait
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
 task.spawn(function() while wait() do mainloop(); end end)

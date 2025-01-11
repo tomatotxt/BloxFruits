@@ -5,6 +5,7 @@ local git = function(path: string)
     return loadstring(game:HttpGet(result))()
 end
 
+wait = task.wait
 getgenv().OptionsAPI = git("API/OptionsAPI.lua")
 getgenv().ServicesAPI = git("API/ServicesAPI.lua")
 getgenv().PlayerAPI = git("API/DynamicAPI.lua")
