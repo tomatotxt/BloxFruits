@@ -2,6 +2,8 @@
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 
 local QuestGUI = DynamicAPI.LocalPlayer.PlayerGui.Main.Quest
+local Dialogue = DynamicAPI.LocalPlayer.PlayerGui.Main.Dialogue
+local EnemySpawns = workspace._WorldOrigin.EnemySpawns
 
 local function getEnemy()
     local Enemies = workspace.Enemies
@@ -13,45 +15,50 @@ local function getEnemy()
 end
 local function getNPC()
     local NPCs = workspace.NPCs
-    for i, PotentialNPC in pairs(NPCs:GetChildren()) do
-        if PotentialNPC.ClassName == "Model" and PotentialNPC:GetAttribute("DistanceCulled") == false then
-            return PotentialNPC
-        end
-    end
+    return NPCs:FindFirstChild("QUEST", true).Parent.Parent
 end
 
-local function startQuest(npcName, num)
+local function startQuest(NPC)
     if QuestGUI.Visible == true then return end
-    local args = {
-        [1] = "StartQuest",
-        [2] = npcName .. "Quest" .. tostring(num),
-        [3] = num
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_"):InvokeServer(unpack(args))
+    DynamicAPI.getCharacter().Humanoid.RootPart.CFrame = NPC.PrimaryPart.CFrame
+    wait()
+    mousemoveabs(960, 540)
+    mouse1click()
 end
 
---while task.wait() do
+--while wait() do
     -- Start Quest
     local NPC = getNPC()
-    DynamicAPI.getCharacter().Humanoid.RootPart.CFrame = NPC.PrimaryPart.CFrame
-    startQuest(NPC.Name, 1)
+    print("NPC", NPC)
+    startQuest(NPC)
     -- Get Quest Info
     local QuestString = QuestGUI.Container.QuestTitle.Title.Text
-    local QuestCount = tonumber(string.match(QuestString, "DEFEAT %d+%s")):sub(8, -1)
+    local QuestCount = tonumber(QuestString:sub(8, 9))
+    local Option1 = Dialogue.Option1.TextLabel.Text
+    local Option2 = Dialogue.Option2.TextLabel.Text
+    local Option3 = Dialogue.Option3.TextLabel.Text
+
+    local NPC1 = nil
+    local NPC2 = nil
+    local BOSS = nil
+    if Option3 == "Option" then
+        NPC1 = Option1
+        BOSS = Option2
+    else
+        NPC1 = Option1
+        NPC2 = Option2
+        BOSS = Option3
+    end
 
     -- Kill Enemies
     for i = 1, QuestCount do
         local Enemy = getEnemy()
-        repeat
-            if Enemy then 
-                local Offset = Enemy.Head.Size.Y / 2
-                local SafeSpot = CFrame.new(Enemy.Head.Position) * CFrame.new(0, 4.5 + Offset, 0)
-                TeleportAPI.Teleport(SafeSpot, 1000)
-                DynamicAPI.getCharacter().Humanoid.RootPart.Velocity = Vector3.zero
-            end
-            wait()
-        until not Enemy or Enemy.Humanoid.Health <= 0
+        while wait() and Enemy do 
+            local Offset = Enemy.Head.Size.Y / 2
+            local SafeSpot = CFrame.new(Enemy.Head.Position) * CFrame.new(0, 4.5 + Offset, 0)
+            TeleportAPI.Teleport(SafeSpot, 1000)
+        end
+        wait()
     end
 --end
 
