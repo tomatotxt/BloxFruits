@@ -19,7 +19,8 @@ API.Teleport = function(Goal, Speed)
     local RootPart = DynamicAPI.getCharacter().HumanoidRootPart
     local Magnitude = (RootPart.Position - Goal.Position).Magnitude
     -- Move RootPart to Goal Height
-    RootPart.CFrame = RootPart.CFrame * CFrame.new(0, RootPart.Position.Y - Goal.Position.Y, 0)
+    local CurrentPos = RootPart.Position
+    RootPart.CFrame = CFrame.new(CurrentPos.X, Goal.Position.Y, CurrentPos.Z)
 
     while not (Magnitude < 1) do
         local Direction = (Goal.Position - RootPart.Position).unit
