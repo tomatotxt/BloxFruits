@@ -1,6 +1,4 @@
-getgenv().branch = "main"
-getgenv().owner = "ImMejor35"
-local API_VERSION = 1.2
+local API_VERSION = 1.3 -- DO NOT FORGET TO UPDATE THIS OTHERWISE ALL FOR NOT
 
 -- Intialize BloxFruits Folder if missing..
 if not isfolder("BloxFruits") then makefolder("BloxFruits") end
@@ -24,7 +22,7 @@ local git = function(path)
     -- Write API to file if missing or if change is needed.
     local result = nil;
     if not isfile(realpath) or Change then
-        local url = string.format("https://github.com/%s/BloxFruits/raw/refs/heads/%s/%s", owner, branch, path)
+        local url = string.format("https://github.com/%s/BloxFruits/raw/refs/heads/%s/%s", getgenv().gitowner, getgenv().TimeSkipBranch, path)
         result = game:HttpGet(url)
         writefile(realpath, result)
     end
