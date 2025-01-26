@@ -1,5 +1,6 @@
 local API = {}
-
+return API
+--[[
 local rawAttackMelee = nil
 API.attackMelee    = nil
 for i,v in pairs(getgc()) do
@@ -12,10 +13,10 @@ for i,v in pairs(getgc()) do
       end
    end 
 end
-setthreadidentity(2)
+
 API.CombatFramework = require(ServicesAPI.ReplicatedStorage.Controllers.CombatController)
 API.CameraShaker = require(ServicesAPI.ReplicatedStorage.Util.CameraShaker.Main)
-setthreadidentity(8)
+
 
 -- CONSTRUCT getWeapon FUNCTION
 API.CurrentWeapon = nil
@@ -50,4 +51,4 @@ API.ToggleFastAttack = function()
     return FastAttack
 end
 
-return API
+return API--]]
