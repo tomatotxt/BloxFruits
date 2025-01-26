@@ -1,4 +1,4 @@
-local API_VERSION = 1.3 -- DO NOT FORGET TO UPDATE THIS OTHERWISE ALL FOR NOT
+local API_VERSION = 1.4 -- DO NOT FORGET TO UPDATE THIS OTHERWISE ALL FOR NOT
 
 -- Intialize BloxFruits Folder if missing..
 if not isfolder("BloxFruits") then makefolder("BloxFruits") end
