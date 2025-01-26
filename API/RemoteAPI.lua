@@ -5,7 +5,7 @@ API.attackMelee    = nil
 for i,v in pairs(getgc()) do
    if type(v) == "function" and getinfo(v).name == "attackMelee" then
       rawAttackMelee = v
-      API.attackMelee    = function(...)
+      API.attackMelee = function(...)
         setthreadidentity(2) -- Weird Error if you don't set the thread identity
         rawAttackMelee(...)
         setthreadidentity(8)
