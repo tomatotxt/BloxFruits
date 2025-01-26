@@ -44,7 +44,7 @@ local function SafeExecute(Function, OptionName)
 end
 
 local AutoChestFarm = function()
-    while wait() do
+    while wait(0.312159) do
         if OptionsAPI.getOption("ChestAutoFarm") then
             SafeExecute(function() 
                 local Chests = getChestsSorted()
