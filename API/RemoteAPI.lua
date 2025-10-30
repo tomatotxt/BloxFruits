@@ -1,54 +1,50 @@
 local API = {}
-return API
---[[
-local rawAttackMelee = nil
-API.attackMelee    = nil
-for i,v in pairs(getgc()) do
-   if type(v) == "function" and getinfo(v).name == "attackMelee" then
-      rawAttackMelee = v
-      API.attackMelee = function(...)
-        setthreadidentity(2) -- Weird Error if you don't set the thread identity
-        rawAttackMelee(...)
-        setthreadidentity(8)
-      end
-   end 
+
+local Net = ServicesAPI.ReplicatedStorage.Modules.Net
+local RegisterAttack = Net["RE/RegisterAttack"]
+local RegisterHit = Net["RE/RegisterHit"]
+
+local UserId = ServicesAPI.Players.LocalPlayer.UserId
+
+local function GetSessionID()
+    -- Get Combat Thread
+    local SendHitsToServer = getrenv()._G.SendHitsToServer
+    local CombatThread = getupvalues(SendHitsToServer)[1]
+    -- Construct Session ID
+    local UserIDSlice = tostring(UserId):sub(2, 4)
+    local MemorySlice = tostring(CombatThread):sub(11, 15)
+    -- Combine The Two Parts
+    local SessionID = UserIDSlice .. MemorySlice
+
+    return SessionID
 end
 
-API.CombatFramework = require(ServicesAPI.ReplicatedStorage.Controllers.CombatController)
-API.CameraShaker = require(ServicesAPI.ReplicatedStorage.Util.CameraShaker.Main)
+local function Attack(TargetCharacter)
+    RegisterAttack:FireServer(0.5)
+    local dataTable = {
+        TargetCharacter:WaitForChild("RightLowerLeg"),
+        {},
+        nil,
+        GetSessionID()
+    }
+    RegisterHit:FireServer(unpack(dataTable))
+end
 
+local function Kill(EnemyCharacter)
+    repeat task.wait()
+        Attack(EnemyCharacter)
+    until EnemyCharacter.Humanoid.Health == 0
+end
 
--- CONSTRUCT getWeapon FUNCTION
+local function KillAsync(EnemyCharacter)
+    task.spawn(Kill, EnemyCharacter)
+end
+
+API.GetSessionID = GetSessionID
+API.Attack = Attack
+API.Kill = Kill
+API.KillAsync = KillAsync
+
 API.CurrentWeapon = nil
-local function getWeapon()
-    return API.CurrentWeapon
-end
 
-getgenv().Attack = false
-getgenv().FastAttack = false
-
-API.ToggleAttack = function()
-    Attack = not Attack
-    return Attack
-end
-
-ServicesAPI.RunService.RenderStepped:Connect(function()
-    if FastAttack then
-        
-    end
-    if Attack then
-        DynamicAPI.getCharacter().Stun.Value = 0
-        DynamicAPI.getCharacter().Humanoid.Sit = false
-        local Weapon = getWeapon()
-        if not Weapon then return end
-        API.attackMelee(Weapon)
-        API.CameraShaker:Stop()
-    end
-end)
-
-API.ToggleFastAttack = function()
-    FastAttack = not FastAttack
-    return FastAttack
-end
-
-return API--]]
+return API
