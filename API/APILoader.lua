@@ -1,37 +1,15 @@
-local API_VERSION = 1.57 -- DO NOT FORGET TO UPDATE THIS OTHERWISE ALL FOR NOT
+local API_VERSION = 1.57
 
--- Intialize BloxFruits Folder if missing..
-if not isfolder("BloxFruits") then makefolder("BloxFruits") end
+getgenv().TimeSkipBranch = getgenv().TimeSkipBranch or "main"
+getgenv().gitowner = getgenv().gitowner or "ImMejor35"
 
 local git = function(path)
-    -- Enter BloxFruits Folder
-    local realpath = "BloxFruits/" .. path
-
-    -- Create API Folder if missing..
-    if not isfolder("BloxFruits/API") then makefolder("BloxFruits/API") end
-
-    -- Check if API is up-to-date.
-    local Change = false
-    if not isfile("BloxFruits/API/version.txt") then
-        writefile("BloxFruits/API/version.txt", tostring(API_VERSION))
-    elseif readfile("BloxFruits/API/version.txt") ~= tostring(API_VERSION) then
-        writefile("BloxFruits/API/version.txt", tostring(API_VERSION))
-        Change = true
-    end
-
-    -- Write API to file if missing or if change is needed.
-    local result = nil;
-    if not isfile(realpath) or Change then
-        local url = string.format("https://github.com/%s/BloxFruits/raw/refs/heads/%s/%s", getgenv().gitowner, getgenv().TimeSkipBranch, path)
-        result = game:HttpGet(url)
-        writefile(realpath, result)
-    end
+	print(path)	
+    local url = string.format("https://github.com/%s/BloxFruits/raw/refs/heads/%s/%s", getgenv().gitowner, getgenv().TimeSkipBranch, path)
+    result = game:HttpGet(url)
 
     -- Return API
-    if Change then
-        return loadstring(result)()
-    end
-    return loadstring(readfile(realpath))()
+    return loadstring(result)()
 end
 
 getgenv().OptionsAPI = git("API/OptionsAPI.lua")
