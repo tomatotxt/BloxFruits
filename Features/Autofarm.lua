@@ -54,8 +54,7 @@ end
     for i = 1, QuestCount do
         local Enemy = getEnemy()
         while wait() and Enemy do 
-            local Offset = Enemy.Head.Size.Y / 2
-            local SafeSpot = CFrame.new(Enemy.Head.Position) * CFrame.new(0, 4.5 + Offset, 0)
+            local SafeSpot = CFrame.new(Enemy.HumanoidRootPart.Position) * CFrame.new(0, 57, 0)
             TeleportAPI.Teleport(SafeSpot, 1000)
         end
         wait()

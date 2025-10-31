@@ -1,0 +1,82 @@
+FEATURES TODO
+Generated: 2025-10-30
+
+Completed features (and UI status):
+
+- Auto Equip Weapon
+  - Status: Completed
+  - UI: Yes (UI.lua: "Auto Equip Weapon" checkbox -> OptionsAPI key: "AutoEquipWeapon")
+  - Files: main.lua
+  - Notes: main loop handles equipping based on OptionsAPI; RemoteAPI.CurrentWeapon is set by main.lua.
+
+- Chest AutoFarm
+  - Status: Completed
+  - UI: Yes (UI.lua: "Chest Autofarm" checkbox -> OptionsAPI key: "ChestAutoFarm")
+  - Files: Features/Auto Chest.lua, main.lua
+  - Notes: Feature uses TeleportAPI (centralized). Confirm behavior in-game after recent changes.
+
+- Autofarm (quest farming)
+  - Status: Implemented (script exists)
+  - UI: No
+  - Files: Features/Autofarm.lua
+  - Notes: Script uses DynamicAPI and TeleportAPI but is not wired into the main options/loop. Consider adding an OptionsAPI key and a UI checkbox.
+
+- Fruit Sniper
+  - Status: Implemented
+  - UI: No
+  - Files: Features/fruit sniper.lua
+  - Notes: Uses direct Players access; consider switching to DynamicAPI and adding an OptionsAPI toggle + UI entry.
+
+- Infinite Dash
+  - Status: Implemented
+  - UI: No
+  - Files: Features/Infinite Dash.lua
+  - Notes: Hooks CommE remote; switched to ServicesAPI for ReplicatedStorage. Consider adding an OptionsAPI toggle and UI checkbox.
+
+- Saber Quest
+  - Status: Partial / Needs integration
+  - UI: No
+  - Files: Features/saber quest.lua
+  - Notes: Contains helper functions (pressPlates, grabTorch) but no top-level runner. Decide whether this should be auto-run or exposed as utility functions.
+
+- Auto Kill (BETA)
+  - Status: Implemented (in BETA folder)
+  - UI: No
+  - Files: BETA/auto-kill.lua
+  - Notes: Duplicate attack/session logic exists here. BETA folder is experimental — do not modify without explicit request. Consider refactoring to use API/RemoteAPI.Attack if requested.
+
+Unfinished / TODO features (suggested actions):
+
+- Wire Autofarm into main loop
+  - Add OptionsAPI key "AutoFarm" handling in main.lua and a checkbox in UI.lua.
+  - Spawn the `Features/Autofarm.lua` runner when enabled.
+
+- Add UI entries for remaining implemented features
+  - Fruit Sniper, Infinite Dash, Autofarm, Saber Quest (if automated)
+  - Each should set an OptionsAPI key and main.lua or a feature runner should respond to it.
+
+- Centralize remotes into RemoteAPI (optional)
+  - Several scripts call different remotes (CommF_, CommE, Net.*). Consider extending API/RemoteAPI or adding RemotesAPI to wrap/guard remote calls and make attack/quest remotes consistent.
+
+- Replace remaining direct GetService usages with ServicesAPI
+  - Search for any remaining `game:GetService` or direct `game.Players.LocalPlayer` usages and switch to ServicesAPI / DynamicAPI where appropriate.
+
+Notes / Conventions
+- "Completed" means a feature script exists and contains working logic; it may not be wired to the main Options/UI.
+- BETA folder contains experimental scripts that must NOT be modified unless explicitly requested (see BETA/README_DO_NOT_TOUCH.txt).
+
+Files to audit (quick checklist)
+- main.lua
+- UI.lua
+- Features/Auto Chest.lua (done)
+- Features/Autofarm.lua
+- Features/fruit sniper.lua
+- Features/Infinite Dash.lua
+- Features/saber quest.lua
+- BETA/auto-kill.lua (BETA)
+- BETA/npc-api.luau (BETA)
+
+If you want, I can:
+- Add OptionsAPI/UI entries and wire Autofarm and the other features into main.lua.
+- Replace remaining direct service/player accesses across the repo.
+- Create a short PR-style patch for each suggested change for review.

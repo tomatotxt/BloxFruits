@@ -1,4 +1,4 @@
-local tRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommE")
+local tRemote = ServicesAPI.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CommE")
 
 
 local namecall

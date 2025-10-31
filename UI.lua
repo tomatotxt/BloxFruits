@@ -33,3 +33,11 @@ local AutoEquipWeapon = AutomationTab:Checkbox({
 		OptionsAPI.setOption("AutoEquipWeapon", Value)
 	end,
 })
+
+local FruitSniper = AutomationTab:Checkbox({
+    Label = "Fruit Sniper",
+    Value = false,
+    Callback = function(self, Value)
+        OptionsAPI.setOption("FruitSniper", Value)
+    end,
+})

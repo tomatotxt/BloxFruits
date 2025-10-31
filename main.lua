@@ -57,6 +57,31 @@ local AutoChestFarm = function()
 end
 
 
+local FruitSniper = function()
+    while task.wait(0.5) do
+        if OptionsAPI.getOption("FruitSniper") then
+            local Fruit = workspace:FindFirstChildWhichIsA("Tool")
+            if Fruit then
+                local LocalPlayer = DynamicAPI.LocalPlayer
+                task.wait(0.204)
+                repeat
+                    if LocalPlayer and LocalPlayer.Character then
+                        local RootPart = DynamicAPI.getCharacter().HumanoidRootPart
+                        if RootPart and Fruit:FindFirstChild("Handle") then
+                            pcall(function()
+                                firetouchinterest(RootPart, Fruit.Handle, 0)
+                                firetouchinterest(RootPart, Fruit.Handle, 1)
+                            end)
+                        end
+                    end
+                    task.wait()
+                until not Fruit.Parent or Fruit.Parent ~= workspace
+            end
+        end
+    end
+end
+
+
 -- Main
 local function main()
     -- AUTO OPTIONS
@@ -88,5 +113,6 @@ end
 loadstring(game:HttpGet("https://github.com/ImMejor35/BloxFruits/raw/refs/heads/main/API/APILoader.lua"))()
 main()
 task.spawn(AutoChestFarm)
+task.spawn(FruitSniper)
 task.spawn(mainloop)
 print("Main Loaded.")

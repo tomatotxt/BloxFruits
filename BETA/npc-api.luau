@@ -1,8 +1,8 @@
 --loadstring(game:HttpGet("https://github.com/exxtremestuffs/SimpleSpySource/raw/master/SimpleSpy.lua"))()
 
-local Players = cloneref(game:GetService("Players"))
-local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
-local LocalPlayer = Players.LocalPlayer
+local Players = ServicesAPI.Players
+local ReplicatedStorage = ServicesAPI.ReplicatedStorage
+local LocalPlayer = DynamicAPI.LocalPlayer
 
 local CommF = ReplicatedStorage.Remotes.CommF_
 
